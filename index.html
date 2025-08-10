@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>별바람 이름 테스트</title>
+  <meta name="description" content="15문항 성향 테스트 기반 귀여운 캐릭터와 인디언식 이름 생성기" />
+  <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+  <meta property="og:image" content="og-default.png">
+  <meta property="og:title" content="별바람 이름 테스트">
+  <meta property="og:description" content="15문항 성향기반, 나만의 이름과 귀여운 캐릭터">
+
+  <!-- AdSense (추후 승인 후 주석 해제)
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX" crossorigin="anonymous"></script>
+  -->
+</head>
+<body>
+  <header class="container" style="display:flex;align-items:center;padding:12px 0;">
+  <img src="logo.svg" alt="Starwind" style="height:40px;vertical-align:middle;margin-right:8px">
+  <h1 style="margin:0;font-size:1.5rem;">별바람 이름 테스트</h1>
+</header>
+<hr>
+
+  <header class="container">
+    <h1>별바람 이름 테스트</h1>
+    <p class="sub">15문항으로 나의 성향을 알아보고, <strong>나만의 이름</strong>과 <strong>귀여운 캐릭터</strong>를 받아보세요.</p>
+  </header>
+
+  <main class="container card">
+    <form id="quizForm">
+      <div id="quizRoot"></div>
+      <div class="actions">
+        <button type="button" id="prevBtn" class="btn ghost">이전</button>
+        <button type="button" id="nextBtn" class="btn">다음</button>
+        <button type="submit" id="submitBtn" class="btn primary hidden">결과 보기</button>
+      </div>
+      <div class="progress"><div id="bar"></div></div>
+    </form>
+  </main>
+
+  <footer class="container footer">
+    <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a>
+  </footer>
+
+  <script src="data/questions.js"></script>
+  <script src="data/name_parts.js"></script>
+  <script src="data/character_layers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+<!-- deploy trigger -->

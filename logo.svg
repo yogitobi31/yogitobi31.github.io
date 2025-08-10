@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FFCAD4"/>
+      <stop offset="50%" stop-color="#EDE7FF"/>
+      <stop offset="100%" stop-color="#80D8DA"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="200" fill="#ffffff"/>
+  <text x="24" y="120" font-family="Verdana, Arial, sans-serif" font-weight="700" font-size="64" fill="url(#g)">Starwind</text>
+  <text x="28" y="160" font-family="Verdana, Arial, sans-serif" font-size="20" fill="#6B7280">Name & Character Test</text>
+  <circle cx="560" cy="100" r="36" fill="#FFF3C4"/>
+  <circle cx="592" cy="96" r="22" fill="#FFCAD4"/>
+</svg>
