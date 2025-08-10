@@ -280,3 +280,65 @@
 </html>
     <script src="data/name_parts.js"></script>
 
+<script>
+// ==== Direct Layer Renderer (임시 강제 그리기) ====
+(function(){
+  const canvas = document.getElementById('charCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // 1) 우선순위: character_layers.js 값 → 없으면 우리가 올린 파일명 직접 사용
+  const cfg = (window.CHARACTER_LAYERS && window.CHARACTER_LAYERS.layers) ? window.CHARACTER_LAYERS : {
+    layers: [
+      { name: "bg",        items:[{img:"assets/char/layer_background.png"}] },
+      { name: "base",      items:[{img:"assets/char/layer_body.png"}] },
+      { name: "eyes",      items:[{img:"assets/char/layer_eyes.png"}] },
+      { name: "mouth",     items:[{img:"assets/char/layer_mouth.png"}] },
+      { name: "accessory", items:[{img:"assets/char/layer_decor.png"}] }
+    ]
+  };
+
+  // 2) 각 레이어의 첫 아이템만 사용해서 순서대로 그리기
+  const picks = (cfg.layers||[])
+    .map(L => (L.items && L.items[0] ? (L.items[0].img || L.items[0].src) : null))
+    .filter(Boolean);
+
+  if (!picks.length) return;
+
+  // 3) 미니 에러 뷰어 (문제 있으면 화면에 표시)
+  function showErr(m){
+    const box = document.createElement('div');
+    box.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;background:#fff3cd;border:1px solid #ffecb5;border-radius:10px;padding:10px;font-size:12px;z-index:9999';
+    box.innerHTML = '<b>이미지 로드 오류</b><br>'+m;
+    document.body.appendChild(box);
+  }
+
+  // 4) 프리로드 후 그리기
+  const imgs = [];
+  let done = 0;
+  function tryFinish(){
+    if (done < picks.length) return;
+    // 배경색
+    ctx.fillStyle = '#fff8e1';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    // 레이어 합성
+    imgs.forEach(img => { if (img) ctx.drawImage(img, 0, 0, canvas.width, canvas.height); });
+  }
+
+  picks.forEach((url, i)=>{
+    const img = new Image();
+    img.onload = ()=>{ imgs[i]=img; done++; tryFinish(); };
+    img.onerror = ()=>{ done++; showErr('로드 실패: '+url); tryFinish(); };
+    // 캐시 무시
+    img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+  });
+
+  // 이름/설명 자리 임시 문구 (비어 있으면 채움)
+  const nameEl = document.getElementById('nameText');
+  const blurbEl = document.getElementById('blurb');
+  if (nameEl && (!nameEl.textContent || /로딩/i.test(nameEl.textContent))) nameEl.textContent = '기본 캐릭터가 나타났어요!';
+  if (blurbEl && (!blurbEl.textContent || /분석/i.test(blurbEl.textContent))) blurbEl.textContent = '임시 조합으로 표시 중입니다.';
+})();
+</script>
+
+  <!-- <script src="app_result.js"></script> -->
