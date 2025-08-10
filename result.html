@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>결과 - 별바람 이름 테스트 (Safe)</title>
+  <title>결과 - 별바람 이름 테스트</title>
 
-  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 캐릭터를 확인해보세요!" />
+  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 귀여운 캐릭터를 확인해보세요!" />
   <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
 
   <style>
     :root { --ink:#1f2937; --muted:#6b7280; --brand:#7b4f1d; --card:#fffaf0; --line:#ffe4b5; }
-    html,body{margin:0;padding:0;background:#fefcf8;color:var(--ink);font-family:system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif}
+    html,body{margin:0;padding:0;background:#fefcf8;color:var(--ink);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
     .container{max-width:1024px;margin:0 auto;padding:16px}
     .card{background:#fff;border:1px solid #eee;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:16px}
     header.container{padding:20px 16px}
@@ -32,14 +33,13 @@
     .quote-footer a{font-size:12px;color:#2563EB;text-decoration:underline;white-space:nowrap}
     .tip{font-size:12px;color:#9CA3AF;margin-top:8px}
     .ad-placeholder{text-align:center;color:#9CA3AF;padding:12px 0;border:1px dashed #e5e7eb;border-radius:10px}
-    /* 하단 오류 박스 */
     .err{position:fixed;left:8px;right:8px;bottom:8px;background:#fff3cd;color:#111;border:1px solid #ffecb5;border-radius:10px;padding:10px;font-size:12px;z-index:9999}
   </style>
 </head>
 <body>
   <header class="container">
-    <h1>당신의 결과 (안전 모드)</h1>
-    <p class="subtle">외부 스크립트 없이도 보이도록 구성했습니다. 보이면 파이프라인은 정상입니다.</p>
+    <h1>당신의 결과</h1>
+    <p class="subtle">성향 분석을 바탕으로 탄생한 영혼의 이름과 캐릭터</p>
   </header>
 
   <main class="container card">
@@ -74,65 +74,87 @@
     <a href="index.html">다시 테스트하기</a> · <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a>
   </footer>
 
+  <!-- (있으면 사용) 외부 리소스 -->
+  <script src="data/name_parts.js"></script>
+  <script src="data/character_layers.js"></script>
+  <!-- 안전장치 SHIM -->
   <script>
-    // ===== 오류도 화면에 표시 (무조건 보이게) =====
+    // 오류 박스
     window.onerror = function(msg, src, line, col){
       const box = document.createElement('div');
       box.className = 'err';
       box.innerHTML = '<b>오류 감지</b><br>'+ msg + '<br><small>'+ (src||'inline') +':'+ (line||0) +':'+ (col||0) +'</small>';
       document.body.appendChild(box);
     };
-
-    // ===== 로컬스토리지에서 결과 읽기(없어도 안 죽음) =====
+    // 결과 데이터
     function getPayload(){
-      try{
-        const p = JSON.parse(localStorage.getItem('resultPayload')||'null');
-        return p && typeof p === 'object' ? p : null;
-      }catch(e){ return null; }
+      try{const p=JSON.parse(localStorage.getItem('resultPayload')||'null');return p&&typeof p==='object'?p:null;}catch(e){return null;}
     }
-    const payload = getPayload();
-    const axes = payload?.axes || null;
+    // SHIMs
+    window.NAME_PARTS = window.NAME_PARTS || {
+      adjectives:["불꽃같은","고요한","자유로운","빛나는","은은한","맑은","빠른","단단한","따스한","깊은"],
+      nouns:["매","사슴","늑대","곰","여우","강","바람","별빛","해오라기","자작나무"],
+      suffixes:["의 노래","의 그림자","의 숨결","의 빛","의 약속","의 균형","의 숨소리","의 포옹","의 꿈","의 길"]
+    };
+    window.CHARACTER_LAYERS = window.CHARACTER_LAYERS || {
+      rarityWeights:{UR:0.05, SR:0.15, R:0.30, C:0.50},
+      layers:[
+        {name:"bg",mode:"single",items:[
+          {id:"bg-C",rarity:"C", img:"assets/char/layer_background.png",tags:["any"]},
+          {id:"bg-R",rarity:"R", img:"assets/char/layer_background.png",tags:["any"]},
+          {id:"bg-SR",rarity:"SR",img:"assets/char/layer_background.png",tags:["any"]},
+          {id:"bg-UR",rarity:"UR",img:"assets/char/layer_background.png",tags:["any"]}
+        ]},
+        {name:"base",mode:"single",items:[{id:"base-1",img:"assets/char/layer_body.png",tags:["any"]}]},
+        {name:"eyes",mode:"single",items:[
+          {id:"eyes-happy",img:"assets/char/layer_eyes.png",tags:["wind","earth","star","any"]},
+          {id:"eyes-smile",img:"assets/char/layer_eyes.png",tags:["fire","water","any"]}
+        ]},
+        {name:"mouth",mode:"single",items:[
+          {id:"mouth-smile",img:"assets/char/layer_mouth.png",tags:["wind","earth","star","any"]},
+          {id:"mouth-u",    img:"assets/char/layer_mouth.png",tags:["fire","water","any"]}
+        ]},
+        {name:"accessory",mode:"optional",chance:0.85,items:[
+          {id:"acc-feather",img:"assets/char/layer_decor.png",tags:["wind","star","any"]},
+          {id:"acc-flame",  img:"assets/char/layer_decor.png",tags:["fire","any"]},
+          {id:"acc-leaf",   img:"assets/char/layer_decor.png",tags:["earth","any"]},
+          {id:"acc-drop",   img:"assets/char/layer_decor.png",tags:["water","any"]}
+        ]},
+        {name:"border",mode:"optional",chance:1.0,items:[
+          {id:"border-C", rarity:"C",  img:"assets/char/border/border_common.png",tags:["any"]},
+          {id:"border-R", rarity:"R",  img:"assets/char/border/border_rare.png",  tags:["any"]},
+          {id:"border-SR",rarity:"SR", img:"assets/char/border/border_sr.png",    tags:["any"]},
+          {id:"border-UR",rarity:"UR", img:"assets/char/border/border_ur.png",    tags:["any"]}
+        ]}
+      ]
+    };
+  </script>
 
-    // ===== 아주 간단한 이름/설명 생성 (임시) =====
-    function fallbackName(a){
-      if(!a) return '별바람의 손님';
-      const themes = ['바람','불','대지','물','별'];
-      const score = [
-        (a.free||0)+0.3*(a.dreamy||0),
-        (a.lively||0)+0.2*(a.extra||0),
-        (a.warm||0)+0.2*(1-(a.free||0)),
-        (1-(a.extra||0)),
-        (a.dreamy||0)+0.2*(a.free||0)
-      ];
-      const idx = score.indexOf(Math.max(...score));
-      return ['자유로운 바람','타오르는 불꽃','따스한 대지','깊은 물결','밤하늘의 별빛'][idx] + '의 이름';
-    }
-
-    // ===== 캔버스에 심플한 일러스트(임시) =====
-    (function draw(){
-      const c = document.getElementById('charCanvas');
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#fff8e1'; ctx.fillRect(0,0,c.width,c.height);
-      ctx.fillStyle = '#ffd28b'; ctx.beginPath(); ctx.arc(450,420,220,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#6d4c41'; ctx.font = 'bold 42px system-ui, Arial'; ctx.textAlign = 'center';
-      ctx.fillText('⭐ SPIRIT NAME ⭐', 450, 120);
-      ctx.font = '28px system-ui, Arial';
-      ctx.fillText((payload && payload.seed) ? ('seed '+String(payload.seed).slice(0,8)+'…') : 'no-seed', 450, 860);
+  <!-- 이름/공유/저장 UX -->
+  <script>
+    // 간단 이름 생성 (외부 app_result.js 없어도 동작)
+    (function genName(){
+      const p = getPayload();
+      const a = window.NAME_PARTS;
+      const adj = a.adjectives[Math.floor(Math.random()*a.adjectives.length)];
+      const noun = a.nouns[Math.floor(Math.random()*a.nouns.length)];
+      const suf = a.suffixes[Math.floor(Math.random()*a.suffixes.length)];
+      const name = `${adj} ${noun}${suf}`;
+      const nameEl = document.getElementById('nameText');
+      if (nameEl && (!nameEl.textContent || /로딩/i.test(nameEl.textContent))) nameEl.textContent = name;
+      const blurb = document.getElementById('blurb');
+      if (blurb) {
+        blurb.textContent = p?.axes ? '당신의 성향 데이터를 반영해 이름을 만들었어요.' : '임시 조합으로 이름을 만들었어요.';
+      }
+      const tags = document.getElementById('tags');
+      if (tags && p?.axes) {
+        tags.innerHTML = `<span>free:${(p.axes.free*100|0)}%</span><span>extra:${(p.axes.extra*100|0)}%</span>
+          <span>lively:${(p.axes.lively*100|0)}%</span><span>warm:${(p.axes.warm*100|0)}%</span>
+          <span>dreamy:${(p.axes.dreamy*100|0)}%</span>`;
+      }
     })();
 
-    // ===== 텍스트/태그 =====
-    document.getElementById('nameText').textContent = fallbackName(axes);
-    document.getElementById('blurb').textContent = axes
-      ? '당신의 성향 데이터를 불러왔어요. 아래 태그를 확인해 보세요.'
-      : '임시 표시: 아직 성향 데이터가 없어요. 메인에서 설문 완료 후 다시 와주세요.';
-    const tags = document.getElementById('tags');
-    tags.innerHTML = axes
-      ? `<span>free: ${(axes.free*100|0)}%</span><span>extra: ${(axes.extra*100|0)}%</span>
-         <span>lively: ${(axes.lively*100|0)}%</span><span>warm: ${(axes.warm*100|0)}%</span>
-         <span>dreamy: ${(axes.dreamy*100|0)}%</span>`
-      : `<span>데이터 없음</span>`;
-
-    // ===== 공유/저장 =====
+    // 공유/저장
     document.getElementById('shareBtn').addEventListener('click', async ()=>{
       try{
         const url = location.href;
@@ -149,53 +171,113 @@
         a.click();
       }catch(e){ alert('이미지 저장을 지원하지 않는 브라우저예요. 캡처를 사용해 주세요.'); }
     });
+  </script>
 
-    // ===== 성향→테마 & 명언(영+한) =====
-    function pickThemeByAxes(a){
-      if(!a) return 'star';
-      const scores = [
-        {theme:'wind',  v:(a.free||0)+0.3*(a.dreamy||0)},
-        {theme:'fire',  v:(a.lively||0)+0.2*(a.extra||0)},
-        {theme:'earth', v:(a.warm||0)+0.2*(1-(a.free||0))},
-        {theme:'water', v:(1-(a.extra||0))},
-        {theme:'star',  v:(a.dreamy||0)+0.2*(a.free||0)}
-      ].sort((x,y)=>y.v-x.v);
-      return scores[0].theme;
+  <!-- 성향→테마 + 희귀도 선택 + 렌더 -->
+  <script>
+    function pickThemeByAxes(axes){
+      const arr = [
+        {theme:'wind',  v:(axes?.free||0)+0.3*(axes?.dreamy||0)},
+        {theme:'fire',  v:(axes?.lively||0)+0.2*(axes?.extra||0)},
+        {theme:'earth', v:(axes?.warm||0)+0.2*(1-(axes?.free||0))},
+        {theme:'water', v:(1-(axes?.extra||0))},
+        {theme:'star',  v:(axes?.dreamy||0)+0.2*(axes?.free||0)}
+      ].sort((a,b)=>b.v-a.v);
+      return arr[0].theme;
     }
+    function pickRarity(weights){
+      const w = weights || {UR:0.05, SR:0.15, R:0.30, C:0.50};
+      const r = Math.random(); let acc=0;
+      for(const k of ["UR","SR","R","C"]){ acc+=w[k]||0; if(r<=acc) return k; }
+      return "C";
+    }
+    function pickItem(layer, theme, rarity){
+      const items = layer.items||[];
+      let pool = items.filter(it => it.rarity===rarity && ((it.tags||[]).includes(theme)|| (it.tags||[]).includes("any")));
+      if (!pool.length) pool = items.filter(it => (it.tags||[]).includes(theme) || (it.tags||[]).includes("any"));
+      if (!pool.length) pool = items;
+      if (!pool.length) return null;
+      return pool[Math.floor(Math.random()*pool.length)];
+    }
+
+    (function renderByRarityTheme(){
+      const cfg = window.CHARACTER_LAYERS;
+      if (!cfg?.layers?.length) return;
+      const canvas = document.getElementById('charCanvas'); if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      // 결과 축
+      let axes=null; try{ const p=getPayload(); axes=p?.axes||null; }catch(e){}
+      const theme = axes ? pickThemeByAxes(axes) : 'star';
+      const rarity = pickRarity(cfg.rarityWeights);
+
+      // 선택
+      const picks = (cfg.layers||[]).map(layer=>{
+        if (layer.mode==='optional'){
+          const chance = (typeof layer.chance==='number') ? layer.chance : 0.6;
+          if (Math.random() > chance) return null;
+        }
+        const item = pickItem(layer, theme, rarity);
+        return item ? (item.img||item.src) : null;
+      }).filter(Boolean);
+
+      // 로드 & 합성
+      const imgs=[]; let loaded=0;
+      function finish(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle='#fff8e1'; ctx.fillRect(0,0,canvas.width,canvas.height); // 안전 배경
+        imgs.forEach(img=>img && ctx.drawImage(img,0,0,canvas.width,canvas.height));
+        // 희귀도 배지 표시(임시 텍스트) — 테두리 PNG 오면 삭제해도 됨
+        const nameEl=document.getElementById('nameText');
+        if (nameEl && !/\[(UR|SR|R|C)\]/.test(nameEl.textContent)) nameEl.textContent += ` [${rarity}]`;
+      }
+      picks.forEach((url,i)=>{
+        const img=new Image();
+        img.onload=()=>{imgs[i]=img; if(++loaded===picks.length) finish();};
+        img.onerror=()=>{if(++loaded===picks.length) finish();};
+        img.src = url + (url.includes('?')?'&':'?') + 'v=' + Date.now();
+      });
+    })();
+  </script>
+
+  <!-- 명언(영문 + 작은 한글 번역) -->
+  <script>
     const QUOTES = {
-      earth: [{
-        leader:"Red Cloud (Oglala Lakota)", nation:"Oglala Lakota",
+      earth: [{leader:"Red Cloud (Oglala Lakota)",nation:"Oglala Lakota",
         quote:"We do not want riches; we want our children trained and brought up properly.",
         ko:"우리는 부를 원하지 않습니다. 우리 아이들이 제대로 배우고 자라길 원합니다.",
-        source:"Address at Cooper Union (1870)", url:"https://teachingamericanhistory.org/document/address-at-cooper-union-2/"
-      }],
-      water: [{
-        leader:"Chief Joseph (Nez Perce)", nation:"Nez Perce",
+        source:"Address at Cooper Union (1870)",url:"https://teachingamericanhistory.org/document/address-at-cooper-union-2/"}],
+      water: [{leader:"Chief Joseph (Nez Perce)",nation:"Nez Perce",
         quote:"From where the sun now stands, I will fight no more forever.",
         ko:"지금 이 자리에서, 나는 더 이상 싸우지 않겠습니다.",
-        source:"Surrender Statement (1877)", url:"https://teachingamericanhistory.org/document/i-will-fight-no-more-forever/"
-      }],
-      star: [{
-        leader:"Sitting Bull (Hunkpapa Lakota)", nation:"Hunkpapa Lakota",
+        source:"Surrender Statement (1877)",url:"https://teachingamericanhistory.org/document/i-will-fight-no-more-forever/"}],
+      star: [{leader:"Sitting Bull (Hunkpapa Lakota)",nation:"Hunkpapa Lakota",
         quote:"Let us put our minds together and see what life we can make for our children.",
         ko:"우리 마음을 모아, 아이들을 위해 어떤 삶을 만들지 생각해 봅시다.",
-        source:"Library of Congress", url:"https://www.loc.gov/pictures/item/2016648134/"
-      }],
-      wind: [{
-        leader:"Luther Standing Bear (Oglala Lakota)", nation:"Oglala Lakota",
+        source:"Library of Congress",url:"https://www.loc.gov/pictures/item/2016648134/"}],
+      wind: [{leader:"Luther Standing Bear (Oglala Lakota)",nation:"Oglala Lakota",
         quote:"The old Lakota was wise. He knew that man's heart, away from nature, becomes hard.",
         ko:"현명한 라코타는 알았어요. 자연과 멀어질수록 사람의 마음은 굳어진다는 것을.",
-        source:"Land of the Spotted Eagle (1933)", url:"https://en.wikipedia.org/wiki/Luther_Standing_Bear"
-      }],
-      fire: [{
-        leader:"Sarah Winnemucca (Northern Paiute)", nation:"Northern Paiute",
+        source:"Land of the Spotted Eagle (1933)",url:"https://en.wikipedia.org/wiki/Luther_Standing_Bear"}],
+      fire: [{leader:"Sarah Winnemucca (Northern Paiute)",nation:"Northern Paiute",
         quote:"I have nothing to say for myself, only for my people.",
         ko:"나 자신을 위한 말은 없습니다. 오직 내 사람들을 위한 말만 있습니다.",
-        source:"Life Among the Piutes (1883)", url:"https://archive.org/details/lifeamongpiutesh00sara"
-      }]
+        source:"Life Among the Piutes (1883)",url:"https://archive.org/details/lifeamongpiutesh00sara"}]
     };
     (function renderQuote(){
-      const theme = pickThemeByAxes(axes);
+      // theme 재사용
+      let axes=null; try{ axes=getPayload()?.axes||null; }catch(e){}
+      const theme = axes ? (function(axes){
+        const arr=[
+          {theme:'wind',  v:(axes?.free||0)+0.3*(axes?.dreamy||0)},
+          {theme:'fire',  v:(axes?.lively||0)+0.2*(axes?.extra||0)},
+          {theme:'earth', v:(axes?.warm||0)+0.2*(1-(axes?.free||0))},
+          {theme:'water', v:(1-(axes?.extra||0))},
+          {theme:'star',  v:(axes?.dreamy||0)+0.2*(axes?.free||0)}
+        ].sort((a,b)=>b.v-a.v);
+        return arr[0].theme;
+      })(axes) : 'star';
+
       const pool = QUOTES[theme] || QUOTES.star;
       const q = pool[Math.floor(Math.random()*pool.length)];
       const el = document.getElementById('wisdom');
@@ -208,137 +290,10 @@
           <a href="${q.url}" target="_blank" rel="noopener">출처: ${q.source}</a>
         </div>`;
     })();
-
-
   </script>
 
-<script>
-// ---- 강제 렌더 패치: CHARACTER_LAYERS 기반으로 바로 그려주기 ----
-(function(){
-  const cfg = (window.CHARACTER_LAYERS && window.CHARACTER_LAYERS.layers) ? window.CHARACTER_LAYERS : {layers:[]};
-  const canvas = document.getElementById('charCanvas');
-  if (!canvas || !cfg.layers.length) return; // 없으면 조용히 패스
-  const ctx = canvas.getContext('2d');
-
-  // 레이어 선택 규칙: 각 레이어의 첫 번째 item 사용 (optional은 확률 적용)
-  function pickItem(layer){
-    const items = layer.items || [];
-    if (!items.length) return null;
-    if (layer.mode === 'optional') {
-      const chance = (typeof layer.chance === 'number') ? layer.chance : 0.6;
-      if (Math.random() > chance) return null;
-    }
-    return items[0];
-  }
-
-  // 프리로드
-  const picks = cfg.layers.map(layer => ({layer, item: pickItem(layer)})).filter(x => x.item);
-  const urls = picks.map(x => (x.item.img || x.item.src));
-  const images = [];
-  let loaded = 0;
-
-  function done() {
-    // 배경 깔기
-    ctx.fillStyle = '#fff8e1';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    // 레이어 순서대로 그림
-    picks.forEach((x, i) => {
-      const img = images[i];
-      if (img) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    });
-  }
-
-  urls.forEach((url, i) => {
-    const img = new Image();
-    img.onload = function(){
-      images[i] = img;
-      loaded++;
-      if (loaded === urls.length) done();
-    };
-    img.onerror = function(){
-      loaded++;
-      if (loaded === urls.length) done();
-    };
-    // 캐시 무시용 버전 파라미터
-    img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
-  });
-
-  // 이름/설명 자리도 비어 있으면 임시 텍스트
-  const nameEl = document.getElementById('nameText');
-  const blurbEl = document.getElementById('blurb');
-  if (nameEl && (!nameEl.textContent || /로딩중/i.test(nameEl.textContent))) {
-    nameEl.textContent = '별바람 캐릭터가 나타났어요!';
-  }
-  if (blurbEl && (!blurbEl.textContent || /분석 중/i.test(blurbEl.textContent))) {
-    blurbEl.textContent = '지금은 기본 조합으로 표시됩니다. (나중에 테마별로 바뀌어요)';
-  }
-})();
-</script>
-
-  
+  <!-- (선택) 기존 렌더러가 있다면 마지막에 불러도 됨 -->
+  <!-- <script src="app_result.js"></script> -->
 </body>
 </html>
-    <script src="data/name_parts.js"></script>
 
-<script>
-// ==== Direct Layer Renderer (임시 강제 그리기) ====
-(function(){
-  const canvas = document.getElementById('charCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
-  // 1) 우선순위: character_layers.js 값 → 없으면 우리가 올린 파일명 직접 사용
-  const cfg = (window.CHARACTER_LAYERS && window.CHARACTER_LAYERS.layers) ? window.CHARACTER_LAYERS : {
-    layers: [
-      { name: "bg",        items:[{img:"assets/char/layer_background.png"}] },
-      { name: "base",      items:[{img:"assets/char/layer_body.png"}] },
-      { name: "eyes",      items:[{img:"assets/char/layer_eyes.png"}] },
-      { name: "mouth",     items:[{img:"assets/char/layer_mouth.png"}] },
-      { name: "accessory", items:[{img:"assets/char/layer_decor.png"}] }
-    ]
-  };
-
-  // 2) 각 레이어의 첫 아이템만 사용해서 순서대로 그리기
-  const picks = (cfg.layers||[])
-    .map(L => (L.items && L.items[0] ? (L.items[0].img || L.items[0].src) : null))
-    .filter(Boolean);
-
-  if (!picks.length) return;
-
-  // 3) 미니 에러 뷰어 (문제 있으면 화면에 표시)
-  function showErr(m){
-    const box = document.createElement('div');
-    box.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;background:#fff3cd;border:1px solid #ffecb5;border-radius:10px;padding:10px;font-size:12px;z-index:9999';
-    box.innerHTML = '<b>이미지 로드 오류</b><br>'+m;
-    document.body.appendChild(box);
-  }
-
-  // 4) 프리로드 후 그리기
-  const imgs = [];
-  let done = 0;
-  function tryFinish(){
-    if (done < picks.length) return;
-    // 배경색
-    ctx.fillStyle = '#fff8e1';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    // 레이어 합성
-    imgs.forEach(img => { if (img) ctx.drawImage(img, 0, 0, canvas.width, canvas.height); });
-  }
-
-  picks.forEach((url, i)=>{
-    const img = new Image();
-    img.onload = ()=>{ imgs[i]=img; done++; tryFinish(); };
-    img.onerror = ()=>{ done++; showErr('로드 실패: '+url); tryFinish(); };
-    // 캐시 무시
-    img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
-  });
-
-  // 이름/설명 자리 임시 문구 (비어 있으면 채움)
-  const nameEl = document.getElementById('nameText');
-  const blurbEl = document.getElementById('blurb');
-  if (nameEl && (!nameEl.textContent || /로딩/i.test(nameEl.textContent))) nameEl.textContent = '기본 캐릭터가 나타났어요!';
-  if (blurbEl && (!blurbEl.textContent || /분석/i.test(blurbEl.textContent))) blurbEl.textContent = '임시 조합으로 표시 중입니다.';
-})();
-</script>
-
-  <!-- <script src="app_result.js"></script> -->
