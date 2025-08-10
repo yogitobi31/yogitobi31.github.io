@@ -211,6 +211,71 @@
 
 
   </script>
+
+<script>
+// ---- 강제 렌더 패치: CHARACTER_LAYERS 기반으로 바로 그려주기 ----
+(function(){
+  const cfg = (window.CHARACTER_LAYERS && window.CHARACTER_LAYERS.layers) ? window.CHARACTER_LAYERS : {layers:[]};
+  const canvas = document.getElementById('charCanvas');
+  if (!canvas || !cfg.layers.length) return; // 없으면 조용히 패스
+  const ctx = canvas.getContext('2d');
+
+  // 레이어 선택 규칙: 각 레이어의 첫 번째 item 사용 (optional은 확률 적용)
+  function pickItem(layer){
+    const items = layer.items || [];
+    if (!items.length) return null;
+    if (layer.mode === 'optional') {
+      const chance = (typeof layer.chance === 'number') ? layer.chance : 0.6;
+      if (Math.random() > chance) return null;
+    }
+    return items[0];
+  }
+
+  // 프리로드
+  const picks = cfg.layers.map(layer => ({layer, item: pickItem(layer)})).filter(x => x.item);
+  const urls = picks.map(x => (x.item.img || x.item.src));
+  const images = [];
+  let loaded = 0;
+
+  function done() {
+    // 배경 깔기
+    ctx.fillStyle = '#fff8e1';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    // 레이어 순서대로 그림
+    picks.forEach((x, i) => {
+      const img = images[i];
+      if (img) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    });
+  }
+
+  urls.forEach((url, i) => {
+    const img = new Image();
+    img.onload = function(){
+      images[i] = img;
+      loaded++;
+      if (loaded === urls.length) done();
+    };
+    img.onerror = function(){
+      loaded++;
+      if (loaded === urls.length) done();
+    };
+    // 캐시 무시용 버전 파라미터
+    img.src = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+  });
+
+  // 이름/설명 자리도 비어 있으면 임시 텍스트
+  const nameEl = document.getElementById('nameText');
+  const blurbEl = document.getElementById('blurb');
+  if (nameEl && (!nameEl.textContent || /로딩중/i.test(nameEl.textContent))) {
+    nameEl.textContent = '별바람 캐릭터가 나타났어요!';
+  }
+  if (blurbEl && (!blurbEl.textContent || /분석 중/i.test(blurbEl.textContent))) {
+    blurbEl.textContent = '지금은 기본 조합으로 표시됩니다. (나중에 테마별로 바뀌어요)';
+  }
+})();
+</script>
+
+  
 </body>
 </html>
     <script src="data/name_parts.js"></script>
