@@ -4,68 +4,130 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>결과 - 별바람 이름 테스트</title>
+
+  <!-- Meta / OG -->
+  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 귀여운 캐릭터를 확인해보세요!" />
   <meta property="og:title" content="나의 별바람 이름 결과" />
   <meta property="og:type" content="website" />
   <meta property="og:description" content="나의 성향으로 탄생한 이름과 캐릭터를 확인해보세요!" />
   <meta property="og:image" content="assets/og_default.png" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
-  <meta property="og:image" content="og-default.png">
-  <meta property="og:title" content="별바람 이름 테스트">
-  <meta property="og:description" content="15문항 성향기반, 나만의 이름과 귀여운 캐릭터">
 
-  <!-- AdSense -->
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- AdSense (자동광고 켜둔 상태에서 함께 사용 가능) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4918757223156683"
      crossorigin="anonymous"></script>
 
-  <!-- 명언 카드용 가벼운 스타일 -->
+  <!-- 페이지 전용 보강 스타일 (가벼움) -->
   <style>
-    .quote-card{
-      border-radius:16px; padding:18px 20px; background:#fffaf0;
-      border:1px solid #ffe4b5; box-shadow:0 6px 18px rgba(0,0,0,.06); margin:16px 0;
+    .result-wrap {display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;}
+    @media (max-width: 900px){ .result-wrap {grid-template-columns:1fr;} }
+    .title {margin: 0 0 6px; font-size: 22px;}
+    .subtle {color:#6b7280; font-size:14px; margin:0 0 14px;}
+    .card-soft {
+      border-radius: 16px; padding: 18px 20px; background: #fffaf0;
+      border: 1px solid #ffe4b5; box-shadow: 0 6px 18px rgba(0,0,0,.06);
     }
-    .quote-card small{ color:#9CA3AF; letter-spacing:.3px; }
-    .quote-text{ font-size:18px; line-height:1.5; font-weight:600; color:#374151; margin:10px 0; }
-    .quote-footer{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
-    .quote-footer a{ font-size:12px; color:#2563EB; text-decoration:underline; white-space:nowrap; }
+    .quote-card small { color:#9CA3AF; letter-spacing:.3px; }
+    .quote-text { font-size:18px; line-height:1.5; font-weight:600; color:#374151; margin:10px 0; }
+    .quote-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .quote-footer a { font-size:12px; color:#2563EB; text-decoration:underline; white-space:nowrap; }
+    .btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .btn.primary { background:#7b4f1d; color:#fff; }
+    .btn.ghost { background:#f3f4f6; }
+    .tip {font-size:12px; color:#9CA3AF; margin-top:8px;}
+    .ad-placeholder { text-align:center; color:#9CA3AF; padding:12px 0; border:1px dashed #e5e7eb; border-radius:10px;}
   </style>
 </head>
 <body>
   <header class="container">
-    <h1>당신의 결과</h1>
+    <h1 class="title">당신의 결과</h1>
+    <p class="subtle">성향 분석을 바탕으로 탄생한 영혼의 이름과 캐릭터</p>
   </header>
 
   <main class="container card result">
-    <canvas id="charCanvas" width="900" height="900" class="canvas"></canvas>
-    <div class="result-text">
-      <h2 id="nameText">이름 로딩중...</h2>
-      <p id="blurb">당신의 성향을 분석 중...</p>
-      <div class="tags" id="tags"></div>
+    <div class="result-wrap">
+      <!-- 캐릭터 캔버스 (app_result.js가 그려줌) -->
+      <div>
+        <canvas id="charCanvas" width="900" height="900" class="canvas" style="max-width:100%;border-radius:12px;"></canvas>
+        <div class="btn-row">
+          <button class="btn primary" id="downloadBtn">이미지 저장</button>
+          <button class="btn ghost" id="shareBtn">공유하기</button>
+          <button class="btn" onclick="location.href='index.html'">다시 하기</button>
+        </div>
+        <div class="tip">* 저장한 이미지는 인스타/카톡 스토리에도 잘 맞아요.</div>
+      </div>
 
-      <!-- ▼ 명언 카드가 여기에 렌더됩니다 -->
-      <section id="wisdom" class="quote-card"></section>
+      <!-- 텍스트/명언/태그 -->
+      <div>
+        <h2 id="nameText">이름 로딩중...</h2>
+        <p id="blurb">당신의 성향을 분석 중...</p>
+        <div class="tags" id="tags" style="margin-bottom:10px;"></div>
 
-      <div class="share">
-        <button class="btn" id="downloadBtn">이미지 저장</button>
-        <button class="btn ghost" id="shareBtn">공유하기</button>
+        <!-- 명언 카드 -->
+        <section id="wisdom" class="card-soft quote-card"></section>
+
+        <!-- 결과 하단 광고(수동 유닛 자리, 자동광고와 병행 가능) -->
+        <div style="margin-top:18px;">
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-4918757223156683"
+            data-ad-slot="1234567890"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
       </div>
     </div>
   </main>
 
-  <section class="container ad card">
-    <!-- 네이티브 광고 자리 (AdSense 승인 후 삽입) -->
+  <section class="container card" style="margin-top:18px;">
     <div class="ad-placeholder">여기에 광고가 표시됩니다</div>
   </section>
 
   <footer class="container footer">
-    <a href="index.html">다시 테스트하기</a> · <a href="privacy.html">개인정보처리방침</a>
+    <a href="index.html">다시 테스트하기</a> · <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a>
   </footer>
 
+  <!-- 데이터/렌더 로직 (기존 파일 유지) -->
   <script src="data/name_parts.js"></script>
   <script src="data/character_layers.js"></script>
   <script src="app_result.js"></script>
 
-  <!-- ▼ 성향→테마 매핑 + 명언 데이터 + 렌더 -->
+  <!-- 결과 공유/저장 UX 보강 -->
+  <script>
+    // 공유
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      try {
+        const url = location.href;
+        if (navigator.share) {
+          await navigator.share({ title: '별바람 이름 테스트', text: '내 영혼의 이름을 확인해보세요!', url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert('링크가 복사되었습니다!');
+        }
+      } catch(e){ /* 유저 취소 등 무시 */ }
+    });
+
+    // 캔버스 저장
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const canvas = document.getElementById('charCanvas');
+      try {
+        const a = document.createElement('a');
+        a.download = 'spirit-name.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      } catch(e){
+        alert('이미지 저장을 지원하지 않는 브라우저예요. 캡처를 사용해 주세요.');
+      }
+    });
+  </script>
+
+  <!-- 성향→테마 매핑 + 명언(검증된 짧은 3개 기본) -->
   <script>
     // 성향 → 테마 매핑 (free/wind, lively/fire, warm/earth, 내향/water, dreamy/star)
     function pickThemeByAxes(axes){
@@ -80,13 +142,13 @@
       return scores[0].theme;
     }
 
-    // 테마별 명언 (검증된 3개 기본 포함; 이후 20+로 확장 예정)
+    // 테마별 명언 (검증 쉬운 짧은 문장 위주 · 확장 예정)
     const SPIRIT_QUOTES_THEMED = {
       wind: [
-        // 자유/여정/바람 관련 명언을 추후 추가
+        // 자유/여정/바람 — 여기 계속 추가 예정
       ],
       fire: [
-        // 열정/의지/도전 관련 명언을 추후 추가
+        // 열정/의지/도전 — 여기 계속 추가 예정
       ],
       earth: [
         {
@@ -149,3 +211,4 @@
   </script>
 </body>
 </html>
+
