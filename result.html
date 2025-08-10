@@ -1,221 +1,308 @@
-<script>
-  /* 1) 성향→테마 매핑 (그대로 사용) */
-  function pickThemeByAxes(axes){
-    const scores = [
-      {theme:'wind',  v:(axes.free||0)+0.3*(axes.dreamy||0)},   // 자유/여정
-      {theme:'fire',  v:(axes.lively||0)+0.2*(axes.extra||0)},  // 열정/도전
-      {theme:'earth', v:(axes.warm||0)+0.2*(1-(axes.free||0))}, // 배려/공동체
-      {theme:'water', v:(1-(axes.extra||0))},                   // 성찰/인내
-      {theme:'star',  v:(axes.dreamy||0)+0.2*(axes.free||0)}    // 비전/상상
-    ];
-    scores.sort((a,b)=>b.v-a.v);
-    return scores[0].theme;
-  }
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>결과 - 별바람 이름 테스트</title>
 
-  /* 2) 테마별 명언 20+ (ko 번역 포함) */
-  const SPIRIT_QUOTES_THEMED = {
-    wind: [
-      {
-        leader:"Luther Standing Bear (Oglala Lakota)",
-        nation:"Oglala Lakota",
-        quote:"The old Lakota was wise. He knew that man's heart, away from nature, becomes hard.",
-        ko:"현명한 라코타는 알았어요. 자연과 멀어질수록 사람의 마음은 굳어진다는 것을.",
-        source:"Land of the Spotted Eagle (1933)",
-        url:"https://en.wikipedia.org/wiki/Luther_Standing_Bear"
-      },
-      {
-        leader:"Black Elk (Oglala Lakota)",
-        nation:"Oglala Lakota",
-        quote:"Even the seasons form a great circle in their changing, and always come back again to where they were.",
-        ko:"계절조차 큰 원을 그리며 제자리로 되돌아옵니다.",
-        source:"Black Elk Speaks",
-        url:"https://archive.org/details/blackelkspeaksbe00neih"
-      },
-      {
-        leader:"Red Jacket (Seneca)",
-        nation:"Seneca",
-        quote:"We are not ashamed to be called Indians.",
-        ko:"우리는 ‘인디언’이라 불리는 것을 부끄러워하지 않습니다.",
-        source:"Speech to Missionary C. C. (1805)",
-        url:"https://www.gilderlehrman.org/history-resources/spotlight-primary-source/red-jacket-defends-native-american-religion-1805"
-      },
-      {
-        leader:"Charles Eastman / Ohiyesa (Dakota)",
-        nation:"Dakota (Santee Sioux)",
-        quote:"Silence is the absolute poise of body, mind, and spirit.",
-        ko:"침묵은 몸과 마음, 영혼이 균형을 이루는 최고의 자세입니다.",
-        source:"The Soul of the Indian (1911)",
-        url:"https://www.gutenberg.org/ebooks/338"
-      }
-    ],
-    fire: [
-      {
-        leader:"Sitting Bull (Hunkpapa Lakota)",
-        nation:"Hunkpapa Lakota",
-        quote:"Let us put our minds together and see what life we can make for our children.",
-        ko:"우리 마음을 모아, 아이들을 위해 어떤 삶을 만들지 생각해 봅시다.",
-        source:"Library of Congress",
-        url:"https://www.loc.gov/pictures/item/2016648134/"
-      },
-      {
-        leader:"Chief Joseph (Nez Perce)",
-        nation:"Nez Perce",
-        quote:"From where the sun now stands, I will fight no more forever.",
-        ko:"지금 이 자리에서, 나는 더 이상 싸우지 않겠습니다.",
-        source:"Surrender Statement (1877)",
-        url:"https://teachingamericanhistory.org/document/i-will-fight-no-more-forever/"
-      },
-      {
-        leader:"Red Cloud (Oglala Lakota)",
-        nation:"Oglala Lakota",
-        quote:"We do not want riches; we want our children trained and brought up properly.",
-        ko:"우리는 부를 원하지 않습니다. 우리 아이들이 제대로 배우고 자라길 원합니다.",
-        source:"Address at Cooper Union (1870)",
-        url:"https://teachingamericanhistory.org/document/address-at-cooper-union-2/"
-      },
-      {
-        leader:"Sarah Winnemucca (Northern Paiute)",
-        nation:"Northern Paiute",
-        quote:"I have nothing to say for myself, only for my people.",
-        ko:"나 자신을 위한 말은 없습니다. 오직 내 사람들을 위한 말만 있습니다.",
-        source:"Life Among the Piutes (1883)",
-        url:"https://archive.org/details/lifeamongpiutesh00sara"
-      }
-    ],
-    earth: [
-      {
-        leader:"Black Elk (Oglala Lakota)",
-        nation:"Oglala Lakota",
-        quote:"All things are our relatives; what we do to everything, we do to ourselves.",
-        ko:"만물은 우리의 친족입니다. 모든 것에 한 일이 곧 우리 자신에게 한 일이지요.",
-        source:"Black Elk Speaks",
-        url:"https://archive.org/details/blackelkspeaksbe00neih"
-      },
-      {
-        leader:"Ohiyesa (Charles Eastman)",
-        nation:"Dakota (Santee Sioux)",
-        quote:"The Great Spirit is everywhere; He hears whatever is in our minds and hearts.",
-        ko:"위대한 영은 어디에나 계시고, 우리의 생각과 마음의 소리를 들으십니다.",
-        source:"The Soul of the Indian (1911)",
-        url:"https://www.gutenberg.org/ebooks/338"
-      },
-      {
-        leader:"Luther Standing Bear (Oglala Lakota)",
-        nation:"Oglala Lakota",
-        quote:"Kinship with all creatures of the earth, sky, and water was a real and active principle.",
-        ko:"하늘과 땅, 물의 모든 존재와의 친연성은 실제이자 살아 있는 원칙이었습니다.",
-        source:"Land of the Spotted Eagle (1933)",
-        url:"https://en.wikipedia.org/wiki/Luther_Standing_Bear"
-      },
-      {
-        leader:"Winona LaDuke (Anishinaabe)",
-        nation:"Anishinaabe",
-        quote:"Power is in the earth; it is in your relationship to the earth.",
-        ko:"힘은 대지에 있으며, 대지와 맺는 관계 속에 있습니다.",
-        source:"Keynotes & writings",
-        url:"https://www.resilience.org/stories/2013-04-15/winona-laduke-a-short-collection-of-quotes/"
-      }
-    ],
-    water: [
-      {
-        leader:"Chief Joseph (Nez Perce)",
-        nation:"Nez Perce",
-        quote:"It does not require many words to speak the truth.",
-        ko:"진실을 말하는 데는 많은 말이 필요하지 않습니다.",
-        source:"Joseph's Speeches",
-        url:"https://www.pbs.org/weta/thewest/people/i_r/joseph.htm"
-      },
-      {
-        leader:"Vine Deloria Jr. (Standing Rock Sioux)",
-        nation:"Lakota (Standing Rock)",
-        quote:"We must learn to be patient with the processes of the Earth.",
-        ko:"우리는 대지가 이루어지는 과정을 인내하며 배워야 합니다.",
-        source:"God Is Red (1973)",
-        url:"https://archive.org/details/godisred00vine"
-      },
-      {
-        leader:"Gertrude Simmons Bonnin / Zitkála-Šá (Yankton Sioux)",
-        nation:"Yankton Sioux",
-        quote:"I was not one of those who cry back to the blanket; I go forward to my work.",
-        ko:"나는 과거로 울며 돌아가는 사람이 아닙니다. 앞으로 나아가 제 일을 할 뿐입니다.",
-        source:"American Indian Stories (1921)",
-        url:"https://www.gutenberg.org/ebooks/10376"
-      },
-      {
-        leader:"N. Scott Momaday (Kiowa)",
-        nation:"Kiowa",
-        quote:"We are what we imagine. Our very existence consists in our imagination.",
-        ko:"우리는 상상한 대로의 존재입니다. 우리의 존재 자체가 상상력으로 이루어집니다.",
-        source:"The Man Made of Words (1997)",
-        url:"https://www.goodreads.com/quotes/707028"
-      }
-    ],
-    star: [
-      {
-        leader:"Black Elk (Oglala Lakota)",
-        nation:"Oglala Lakota",
-        quote:"Everything the Power of the World does is done in a circle.",
-        ko:"세상의 힘이 하는 일은 모두 원을 그리며 이루어집니다.",
-        source:"Black Elk Speaks",
-        url:"https://archive.org/details/blackelkspeaksbe00neih"
-      },
-      {
-        leader:"Wilma Mankiller (Cherokee Nation)",
-        nation:"Cherokee",
-        quote:"The secret of our success is that we never, never give up.",
-        ko:"우리 성공의 비결은 결코, 결코 포기하지 않는 것입니다.",
-        source:"Interviews & speeches",
-        url:"https://www.womenshistory.org/education-resources/biographies/wilma-mankiller"
-      },
-      {
-        leader:"Joy Harjo (Mvskoke/Creek)",
-        nation:"Mvskoke (Creek)",
-        quote:"Remember that you are all people and that all people are you.",
-        ko:"당신은 모두의 일부이며, 모두가 당신의 일부임을 기억하세요.",
-        source:"Conflict Resolution for Holy Beings (2015)",
-        url:"https://www.poetryfoundation.org/poets/joy-harjo"
-      },
-      {
-        leader:"Leslie Marmon Silko (Laguna Pueblo)",
-        nation:"Laguna Pueblo",
-        quote:"I will tell you something about stories, they aren't just entertainment. Don't be fooled. They are all we have.",
-        ko:"이야기에 대해 말할게요. 단순한 오락이 아니에요. 속지 마세요. 이야기는 우리가 가진 전부이기도 해요.",
-        source:"Ceremony (1977)",
-        url:"https://archive.org/details/ceremonynovel00silk"
-      }
-    ]
-  };
+  <!-- Meta / OG -->
+  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 귀여운 캐릭터를 확인해보세요!" />
+  <meta property="og:title" content="나의 별바람 이름 결과" />
+  <meta property="og:type" content="website" />
+  <meta property="og:description" content="나의 성향으로 탄생한 이름과 캐릭터를 확인해보세요!" />
+  <meta property="og:image" content="assets/og_default.png" />
 
-  /* 3) 결과에서 축 불러와 테마에 맞게 랜덤 선택 */
-  function getAxesFromLocalStorage(){
-    try {
-      const payload = JSON.parse(localStorage.getItem('resultPayload')||'null');
-      return payload && payload.axes ? payload.axes : null;
-    } catch(e){ return null; }
-  }
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
 
-  function pickQuote(){
-    const axes = getAxesFromLocalStorage();
-    const theme = axes ? pickThemeByAxes(axes) : 'star';
-    const themed = SPIRIT_QUOTES_THEMED[theme] || [];
-    const pool = themed.length ? themed : Object.values(SPIRIT_QUOTES_THEMED).flat();
-    if (!pool.length) return null;
-    return pool[Math.floor(Math.random()*pool.length)];
-  }
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
 
-  /* 4) 렌더 */
-  (function renderSpiritQuote(){
-    const q = pickQuote();
-    const el = document.getElementById('wisdom');
-    if (!el || !q) return;
-    el.innerHTML = `
-      <small>전통의 말 · ${q.nation}</small>
-      <div class="quote-text">“${q.quote}”</div>
-      ${q.ko ? `<div style="font-size:13px;color:#6b7280;margin-top:6px;">${q.ko}</div>` : ``}
-      <div class="quote-footer" style="margin-top:8px;">
-        <div>— ${q.leader}</div>
-        <a href="${q.url}" target="_blank" rel="noopener">출처: ${q.source}</a>
+  <!-- AdSense (자동광고와 병행 가능) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4918757223156683" crossorigin="anonymous"></script>
+
+  <!-- 페이지 전용 보강 스타일 -->
+  <style>
+    .result-wrap {display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start;}
+    @media (max-width: 900px){ .result-wrap {grid-template-columns:1fr;} }
+    .title {margin: 0 0 6px; font-size: 22px;}
+    .subtle {color:#6b7280; font-size:14px; margin:0 0 14px;}
+    .card-soft {
+      border-radius: 16px; padding: 18px 20px; background: #fffaf0;
+      border: 1px solid #ffe4b5; box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    }
+    .quote-card small { color:#9CA3AF; letter-spacing:.3px; }
+    .quote-text { font-size:18px; line-height:1.5; font-weight:600; color:#374151; margin:10px 0; }
+    .quote-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .quote-footer a { font-size:12px; color:#2563EB; text-decoration:underline; white-space:nowrap; }
+    .btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .btn.primary { background:#7b4f1d; color:#fff; }
+    .btn.ghost { background:#f3f4f6; }
+    .tip {font-size:12px; color:#9CA3AF; margin-top:8px;}
+    .ad-placeholder { text-align:center; color:#9CA3AF; padding:12px 0; border:1px dashed #e5e7eb; border-radius:10px;}
+  </style>
+</head>
+<body>
+  <header class="container">
+    <h1 class="title">당신의 결과</h1>
+    <p class="subtle">성향 분석을 바탕으로 탄생한 영혼의 이름과 캐릭터</p>
+  </header>
+
+  <main class="container card result">
+    <div class="result-wrap">
+      <!-- 캐릭터 캔버스 (있으면 app_result.js가 그리고, 없으면 아래 SAFE 모드가 그려줌) -->
+      <div>
+        <canvas id="charCanvas" width="900" height="900" class="canvas" style="max-width:100%;border-radius:12px;"></canvas>
+        <div class="btn-row">
+          <button class="btn primary" id="downloadBtn">이미지 저장</button>
+          <button class="btn ghost" id="shareBtn">공유하기</button>
+          <button class="btn" onclick="location.href='index.html'">다시 하기</button>
+        </div>
+        <div class="tip">* 저장한 이미지는 인스타/카톡 스토리에도 잘 맞아요.</div>
       </div>
-    `;
-  })();
-</script>
+
+      <!-- 텍스트/명언/태그 -->
+      <div>
+        <h2 id="nameText">이름 로딩중...</h2>
+        <p id="blurb">당신의 성향을 분석 중...</p>
+        <div class="tags" id="tags" style="margin-bottom:10px;"></div>
+
+        <!-- 명언 카드 -->
+        <section id="wisdom" class="card-soft quote-card"></section>
+
+        <!-- 결과 하단 광고(수동 유닛 자리, 자동광고와 병행 가능) -->
+        <div style="margin-top:18px;">
+          <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-4918757223156683"
+            data-ad-slot="1234567890"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section class="container card" style="margin-top:18px;">
+    <div class="ad-placeholder">여기에 광고가 표시됩니다</div>
+  </section>
+
+  <footer class="container footer">
+    <a href="index.html">다시 테스트하기</a> · <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a>
+  </footer>
+
+  <!-- 외부 데이터/렌더 로직 (있으면 사용) -->
+  <script src="data/name_parts.js"></script>
+  <script src="data/character_layers.js"></script>
+  <script src="app_result.js"></script>
+
+  <!-- 공유/저장 -->
+  <script>
+    // 공유
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      try {
+        const url = location.href;
+        if (navigator.share) {
+          await navigator.share({ title: '별바람 이름 테스트', text: '내 영혼의 이름을 확인해보세요!', url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert('링크가 복사되었습니다!');
+        }
+      } catch(e){ /* 유저 취소 등 무시 */ }
+    });
+    // 캔버스 저장
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const canvas = document.getElementById('charCanvas');
+      try {
+        const a = document.createElement('a');
+        a.download = 'spirit-name.png';
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      } catch(e){
+        alert('이미지 저장을 지원하지 않는 브라우저예요. 캡처를 사용해 주세요.');
+      }
+    });
+  </script>
+
+  <!-- 성향→테마 매핑 + 명언(ko 번역 포함) -->
+  <script>
+    function pickThemeByAxes(axes){
+      const scores = [
+        {theme:'wind',  v:(axes?.free||0)+0.3*(axes?.dreamy||0)},   // 자유/여정
+        {theme:'fire',  v:(axes?.lively||0)+0.2*(axes?.extra||0)},  // 열정/도전
+        {theme:'earth', v:(axes?.warm||0)+0.2*(1-(axes?.free||0))}, // 배려/공동체
+        {theme:'water', v:(1-(axes?.extra||0))},                    // 성찰/인내
+        {theme:'star',  v:(axes?.dreamy||0)+0.2*(axes?.free||0)}    // 비전/상상
+      ];
+      scores.sort((a,b)=>b.v-a.v);
+      return scores[0].theme;
+    }
+
+    const SPIRIT_QUOTES_THEMED = {
+      wind: [
+        {
+          leader:"Luther Standing Bear (Oglala Lakota)",
+          nation:"Oglala Lakota",
+          quote:"The old Lakota was wise. He knew that man's heart, away from nature, becomes hard.",
+          ko:"현명한 라코타는 알았어요. 자연과 멀어질수록 사람의 마음은 굳어진다는 것을.",
+          source:"Land of the Spotted Eagle (1933)",
+          url:"https://en.wikipedia.org/wiki/Luther_Standing_Bear"
+        },
+        {
+          leader:"Black Elk (Oglala Lakota)",
+          nation:"Oglala Lakota",
+          quote:"Even the seasons form a great circle in their changing, and always come back again to where they were.",
+          ko:"계절조차 큰 원을 그리며 제자리로 되돌아옵니다.",
+          source:"Black Elk Speaks",
+          url:"https://archive.org/details/blackelkspeaksbe00neih"
+        },
+        {
+          leader:"Red Jacket (Seneca)",
+          nation:"Seneca",
+          quote:"We are not ashamed to be called Indians.",
+          ko:"우리는 ‘인디언’이라 불리는 것을 부끄러워하지 않습니다.",
+          source:"Speech (1805)",
+          url:"https://www.gilderlehrman.org/history-resources/spotlight-primary-source/red-jacket-defends-native-american-religion-1805"
+        },
+        {
+          leader:"Charles Eastman / Ohiyesa (Dakota)",
+          nation:"Dakota (Santee Sioux)",
+          quote:"Silence is the absolute poise of body, mind, and spirit.",
+          ko:"침묵은 몸과 마음, 영혼이 균형을 이루는 최고의 자세입니다.",
+          source:"The Soul of the Indian (1911)",
+          url:"https://www.gutenberg.org/ebooks/338"
+        }
+      ],
+      fire: [
+        {
+          leader:"Sitting Bull (Hunkpapa Lakota)",
+          nation:"Hunkpapa Lakota",
+          quote:"Let us put our minds together and see what life we can make for our children.",
+          ko:"우리 마음을 모아, 아이들을 위해 어떤 삶을 만들지 생각해 봅시다.",
+          source:"Library of Congress",
+          url:"https://www.loc.gov/pictures/item/2016648134/"
+        },
+        {
+          leader:"Chief Joseph (Nez Perce)",
+          nation:"Nez Perce",
+          quote:"From where the sun now stands, I will fight no more forever.",
+          ko:"지금 이 자리에서, 나는 더 이상 싸우지 않겠습니다.",
+          source:"Surrender Statement (1877)",
+          url:"https://teachingamericanhistory.org/document/i-will-fight-no-more-forever/"
+        },
+        {
+          leader:"Red Cloud (Oglala Lakota)",
+          nation:"Oglala Lakota",
+          quote:"We do not want riches; we want our children trained and brought up properly.",
+          ko:"우리는 부를 원하지 않습니다. 우리 아이들이 제대로 배우고 자라길 원합니다.",
+          source:"Address at Cooper Union (1870)",
+          url:"https://teachingamericanhistory.org/document/address-at-cooper-union-2/"
+        },
+        {
+          leader:"Sarah Winnemucca (Northern Paiute)",
+          nation:"Northern Paiute",
+          quote:"I have nothing to say for myself, only for my people.",
+          ko:"나 자신을 위한 말은 없습니다. 오직 내 사람들을 위한 말만 있습니다.",
+          source:"Life Among the Piutes (1883)",
+          url:"https://archive.org/details/lifeamongpiutesh00sara"
+        }
+      ],
+      earth: [
+        {
+          leader:"Black Elk (Oglala Lakota)",
+          nation:"Oglala Lakota",
+          quote:"All things are our relatives; what we do to everything, we do to ourselves.",
+          ko:"만물은 우리의 친족입니다. 모든 것에 한 일이 곧 우리 자신에게 한 일이지요.",
+          source:"Black Elk Speaks",
+          url:"https://archive.org/details/blackelkspeaksbe00neih"
+        },
+        {
+          leader:"Ohiyesa (Charles Eastman)",
+          nation:"Dakota (Santee Sioux)",
+          quote:"The Great Spirit is everywhere; He hears whatever is in our minds and hearts.",
+          ko:"위대한 영은 어디에나 계시고, 우리의 생각과 마음의 소리를 들으십니다.",
+          source:"The Soul of the Indian (1911)",
+          url:"https://www.gutenberg.org/ebooks/338"
+        },
+        {
+          leader:"Luther Standing Bear (Oglala Lakota)",
+          nation:"Oglala Lakota",
+          quote:"Kinship with all creatures of the earth, sky, and water was a real and active principle.",
+          ko:"하늘과 땅, 물의 모든 존재와의 친연성은 실제이자 살아 있는 원칙이었습니다.",
+          source:"Land of the Spotted Eagle (1933)",
+          url:"https://en.wikipedia.org/wiki/Luther_Standing_Bear"
+        },
+        {
+          leader:"Winona LaDuke (Anishinaabe)",
+          nation:"Anishinaabe",
+          quote:"Power is in the earth; it is in your relationship to the earth.",
+          ko:"힘은 대지에 있으며, 대지와 맺는 관계 속에 있습니다.",
+          source:"Keynotes & writings",
+          url:"https://www.resilience.org/stories/2013-04-15/winona-laduke-a-short-collection-of-quotes/"
+        }
+      ],
+      water: [
+        {
+          leader:"Chief Joseph (Nez Perce)",
+          nation:"Nez Perce",
+          quote:"It does not require many words to speak the truth.",
+          ko:"진실을 말하는 데는 많은 말이 필요하지 않습니다.",
+          source:"Joseph's Speeches",
+          url:"https://www.pbs.org/weta/thewest/people/i_r/joseph.htm"
+        },
+        {
+          leader:"Vine Deloria Jr. (Standing Rock Sioux)",
+          nation:"Lakota (Standing Rock)",
+          quote:"We must learn to be patient with the processes of the Earth.",
+          ko:"우리는 대지가 이루어지는 과정을 인내하며 배워야 합니다.",
+          source:"God Is Red (1973)",
+          url:"https://archive.org/details/godisred00vine"
+        },
+        {
+          leader:"Zitkála-Šá / Gertrude Simmons Bonnin (Yankton Sioux)",
+          nation:"Yankton Sioux",
+          quote:"I was not one of those who cry back to the blanket; I go forward to my work.",
+          ko:"나는 과거로 울며 돌아가는 사람이 아닙니다. 앞으로 나아가 제 일을 할 뿐입니다.",
+          source:"American Indian Stories (1921)",
+          url:"https://www.gutenberg.org/ebooks/10376"
+        },
+        {
+          leader:"N. Scott Momaday (Kiowa)",
+          nation:"Kiowa",
+          quote:"We are what we imagine. Our very existence consists in our imagination.",
+          ko:"우리는 상상한 대로의 존재입니다. 우리의 존재 자체가 상상력으로 이루어집니다.",
+          source:"The Man Made of Words (1997)",
+          url:"https://www.goodreads.com/quotes/707028"
+        }
+      ],
+      star: [
+        {
+          leader:"Black Elk (Oglala Lakota)",
+          nation:"Oglala Lakota",
+          quote:"Everything the Power of the World does is done in a circle.",
+          ko:"세상의 힘이 하는 일은 모두 원을 그리며 이루어집니다.",
+          source:"Black Elk Speaks",
+          url:"https://archive.org/details/blackelkspeaksbe00neih"
+        },
+        {
+          leader:"Wilma Mankiller (Cherokee Nation)",
+          nation:"Cherokee",
+          quote:"The secret of our success is that we never, never give up.",
+          ko:"우리 성공의 비결은 결코, 결코 포기하지 않는 것입니다.",
+          source:"Interviews & speeches",
+          url:"https://www.womenshistory.org/education-resources/biographies/wilma-mankiller"
+        },
+        {
+          leader:"Joy Harjo (Mvskoke/Creek)",
+          nation:"Mvskoke (Creek)",
+          quote:"Remember that you are all people and that all people are you.",
+          ko:"당신은 모두의 일부이며, 모두가 당신의 일부임을 기억하세요.",
+          source:"Conflict Resolution for Holy Beings (2015)",
+          url:"https://www.poetryfoundation.org/poets/joy-harjo"
+        },
+        {
+          leader:"Leslie Marmon Silko (Laguna Pueblo)",
+          nation:"Laguna Pueblo",
+          quote
+
