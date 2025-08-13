@@ -4,135 +4,332 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>결과 - 별바람 이름 테스트</title>
-  <meta property="og:title" content="나의 별바람 이름 결과" />
-  <meta property="og:type" content="website" />
-  <meta property="og:description" content="나의 성향으로 탄생한 이름과 캐릭터를 확인해보세요!" />
-  <meta property="og:image" content="assets/og_default.png" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
-  <meta property="og:image" content="og-default.png">
-  <meta property="og:title" content="별바람 이름 테스트">
-  <meta property="og:description" content="15문항 성향기반, 나만의 이름과 귀여운 캐릭터">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4918757223156683"
-     crossorigin="anonymous"></script>
+
+  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 귀여운 캐릭터를 확인해보세요!" />
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
+
+  <style>
+    :root { --ink:#1f2937; --muted:#6b7280; --brand:#7b4f1d; --card:#fffaf0; --line:#ffe4b5; }
+    html,body{margin:0;padding:0;background:#fefcf8;color:var(--ink);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+    .container{max-width:1024px;margin:0 auto;padding:16px}
+    .card{background:#fff;border:1px solid #eee;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.06);padding:16px}
+    header.container{padding:20px 16px}
+    h1{margin:0 0 6px;font-size:22px}
+    .subtle{color:var(--muted);margin:0 0 14px;font-size:14px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+    canvas{max-width:100%;border-radius:12px;background:#fff}
+    .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.ghost{background:#f3f4f6}
+    .tags{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+    .tags span{background:#f3f4f6;border-radius:999px;padding:6px 10px;font-size:12px;color:#374151}
+    .quote-card{border-radius:16px;padding:18px 20px;background:var(--card);border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.06);margin-top:14px}
+    .quote-card small{color:#9CA3AF;letter-spacing:.3px}
+    .quote-text{font-size:18px;line-height:1.5;font-weight:600;color:#374151;margin:10px 0}
+    .quote-footer{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .quote-footer a{font-size:12px;color:#2563EB;text-decoration:underline;white-space:nowrap}
+    .tip{font-size:12px;color:#9CA3AF;margin-top:8px}
+    .ad-placeholder{text-align:center;color:#9CA3AF;padding:12px 0;border:1px dashed #e5e7eb;border-radius:10px}
+    .err{position:fixed;left:8px;right:8px;bottom:8px;background:#fff3cd;color:#111;border:1px solid #ffecb5;border-radius:10px;padding:10px;font-size:12px;z-index:9999}
+  </style>
 </head>
 <body>
   <header class="container">
     <h1>당신의 결과</h1>
+    <p class="subtle">성향 분석을 바탕으로 탄생한 영혼의 이름과 캐릭터</p>
   </header>
 
-  <main class="container card result">
-    <canvas id="charCanvas" width="900" height="900" class="canvas"></canvas>
-    <div class="result-text">
-      <h2 id="nameText">이름 로딩중...</h2>
-      <p id="blurb">당신의 성향을 분석 중...</p>
-      <div class="tags" id="tags"></div>
-      <div class="btn-row">
-        <button class="btn primary" id="downloadBtn">이미지 저장</button>
-        <button class="btn ghost" id="shareBtn">공유하기</button>
-        <button class="btn" onclick="location.href='index.html'">다시 하기</button>
-        <!-- 새 버튼 -->
-        <button class="btn" id="makeStory">스토리 포스터</button>
-        <button class="btn" id="makeFeed">피드 포스터</button>
+  <main class="container card">
+    <div class="grid">
+      <div>
+        <canvas id="charCanvas" width="900" height="900"></canvas>
+        <div class="btn-row">
+          <button class="btn primary" id="downloadBtn">이미지 저장</button>
+          <button class="btn ghost" id="shareBtn">공유하기</button>
+          <button class="btn" onclick="location.href='index.html'">다시 하기</button>
+          <button class="btn" id="makeStory">스토리 포스터</button>
+          <button class="btn" id="makeFeed">피드 포스터</button>
+        </div>
+        <div class="tip">* 저장한 이미지는 인스타/카톡 스토리에 잘 맞아요.</div>
+      </div>
+
+      <div>
+        <h2 id="nameText">이름 로딩중…</h2>
+        <p id="blurb">성향을 분석 중…</p>
+        <div id="tags" class="tags"></div>
+
+        <section id="wisdom" class="quote-card"></section>
+
+        <div style="margin-top:12px" class="ad-placeholder">여기에 광고가 표시됩니다</div>
       </div>
     </div>
   </main>
 
-  <section class="container ad card">
-    <!-- 네이티브 광고 자리 -->
+  <section class="container card" style="margin-top:18px;">
     <div class="ad-placeholder">여기에 광고가 표시됩니다</div>
   </section>
 
-  <footer class="container footer">
-    <a href="index.html">다시 테스트하기</a> · <a href="privacy.html">개인정보처리방침</a>
+  <footer class="container" style="padding:12px 16px 28px;color:#9CA3AF">
+    <a href="index.html">다시 테스트하기</a> · <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a>
   </footer>
 
+  <!-- (있으면 사용) 외부 리소스 -->
   <script src="data/name_parts.js"></script>
   <script src="data/character_layers.js"></script>
-  <script src="app_result.js"></script>
 
-  <!-- SNS 포스터 생성 기능 -->
+  <!-- 안전장치/유틸 -->
   <script>
-  (function(){
-    const srcCanvas = document.getElementById('charCanvas');
-    const nameEl = document.getElementById('nameText');
-    const siteTitle = '별바람 이름 테스트';
-    const siteUrl = 'yogitobi31.github.io';
-
-    function drawPoster(w, h){
-      const poster = document.createElement('canvas');
-      poster.width = w; poster.height = h;
-      const ctx = poster.getContext('2d');
-
-      // 배경 그라데이션
-      const g = ctx.createLinearGradient(0,0,0,h);
-      g.addColorStop(0, '#fff8e1');
-      g.addColorStop(1, '#fdebd2');
-      ctx.fillStyle = g;
-      ctx.fillRect(0,0,w,h);
-
-      // 테두리
-      ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-      ctx.lineWidth = Math.max(6, Math.round(w*0.006));
-      ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, w-ctx.lineWidth, h-ctx.lineWidth);
-
-      // 상단 타이틀
-      ctx.fillStyle = '#7b4f1d';
-      ctx.font = `bold ${Math.round(w*0.05)}px system-ui, Arial`;
-      ctx.textAlign = 'center';
-      ctx.fillText(siteTitle, w/2, Math.round(h*0.08));
-
-      // 캐릭터 붙이기
-      const box = Math.min(w*0.75, h*0.55);
-      const x = (w - box)/2;
-      const y = Math.round(h*0.12);
-      ctx.save();
-      const r = Math.round(box*0.04);
-      ctx.beginPath();
-      ctx.moveTo(x+r,y);
-      ctx.arcTo(x+box,y,x+box,y+box,r);
-      ctx.arcTo(x+box,y+box,x,y+box,r);
-      ctx.arcTo(x,y+box,x,y,r);
-      ctx.arcTo(x,y,x+box,y,r);
-      ctx.closePath();
-      ctx.clip();
-      ctx.drawImage(srcCanvas, 0,0,srcCanvas.width,srcCanvas.height, x,y, box,box);
-      ctx.restore();
-
-      // 이름
-      const name = (nameEl?.textContent || '').trim() || '나의 영혼의 이름';
-      ctx.fillStyle = '#1f2937';
-      ctx.font = `700 ${Math.round(w*0.045)}px system-ui, Arial`;
-      ctx.textAlign = 'center';
-      ctx.fillText(name, w/2, y + box + Math.round(h*0.08), w*0.9);
-
-      // 하단 텍스트
-      ctx.fillStyle = '#6b7280';
-      ctx.font = `500 ${Math.round(w*0.028)}px system-ui, Arial`;
-      ctx.fillText('나의 성향으로 만든 이름 & 캐릭터', w/2, h - Math.round(h*0.12));
-      ctx.font = `600 ${Math.round(w*0.03)}px system-ui, Arial`;
-      ctx.fillStyle = '#7b4f1d';
-      ctx.fillText(siteUrl, w/2, h - Math.round(h*0.06));
-
-      return poster;
+    // 오류 박스
+    window.onerror = function(msg, src, line, col){
+      const box = document.createElement('div');
+      box.className = 'err';
+      box.innerHTML = '<b>오류 감지</b><br>'+ msg + '<br><small>'+ (src||'inline') +':'+ (line||0) +':'+ (col||0) +'</small>';
+      document.body.appendChild(box);
+    };
+    // 결과 데이터
+    function getPayload(){
+      try{const p=JSON.parse(localStorage.getItem('resultPayload')||'null');return p&&typeof p==='object'?p:null;}catch(e){return null;}
     }
+    // SHIMs (외부 파일 없어도 동작)
+    window.NAME_PARTS = window.NAME_PARTS || {
+      adjectives:["불꽃같은","고요한","자유로운","빛나는","은은한","맑은","빠른","단단한","따스한","깊은"],
+      nouns:["매","사슴","늑대","곰","여우","강","바람","별빛","해오라기","자작나무"],
+      suffixes:["의 노래","의 그림자","의 숨결","의 빛","의 약속","의 균형","의 숨소리","의 포옹","의 꿈","의 길"]
+    };
+    window.CHARACTER_LAYERS = window.CHARACTER_LAYERS || {
+      rarityWeights:{UR:0.05, SR:0.15, R:0.30, C:0.50},
+      layers:[
+        {name:"bg",mode:"single",items:[
+          {id:"bg-C", rarity:"C",  img:"assets/char/bg/bg_common.png", tags:["any"]},
+          {id:"bg-R", rarity:"R",  img:"assets/char/bg/bg_rare.png",   tags:["any"]},
+          {id:"bg-SR",rarity:"SR", img:"assets/char/bg/bg_sr.png",     tags:["any"]},
+          {id:"bg-UR",rarity:"UR", img:"assets/char/bg/bg_ur.png",     tags:["any"]}
+        ]},
+        {name:"base",mode:"single",items:[{id:"base-1",img:"assets/char/layer_body.png",tags:["any"]}]},
+        {name:"eyes",mode:"single",items:[
+          {id:"eyes-happy",img:"assets/char/layer_eyes.png",tags:["wind","earth","star","any"]},
+          {id:"eyes-smile",img:"assets/char/layer_eyes.png",tags:["fire","water","any"]}
+        ]},
+        {name:"mouth",mode:"single",items:[
+          {id:"mouth-smile",img:"assets/char/layer_mouth.png",tags:["wind","earth","star","any"]},
+          {id:"mouth-u",    img:"assets/char/layer_mouth.png",tags:["fire","water","any"]}
+        ]},
+        {name:"accessory",mode:"optional",chance:0.85,items:[
+          {id:"acc-feather",img:"assets/char/layer_decor.png",tags:["wind","star","any"]},
+          {id:"acc-flame",  img:"assets/char/layer_decor.png",tags:["fire","any"]},
+          {id:"acc-leaf",   img:"assets/char/layer_decor.png",tags:["earth","any"]},
+          {id:"acc-drop",   img:"assets/char/layer_decor.png",tags:["water","any"]}
+        ]},
+        {name:"border",mode:"optional",chance:1.0,items:[
+          {id:"border-C", rarity:"C",  img:"assets/char/border/border_common.png",tags:["any"]},
+          {id:"border-R", rarity:"R",  img:"assets/char/border/border_rare.png",  tags:["any"]},
+          {id:"border-SR",rarity:"SR", img:"assets/char/border/border_sr.png",    tags:["any"]},
+          {id:"border-UR",rarity:"UR", img:"assets/char/border/border_ur.png",    tags:["any"]}
+        ]}
+      ]
+    };
 
-    function saveCanvasAsPng(canvas, filename){
-      const a = document.createElement('a');
-      a.download = filename;
-      a.href = canvas.toDataURL('image/png');
-      a.click();
+    // 성향→테마
+    function pickThemeByAxes(axes){
+      const arr = [
+        {theme:'wind',  v:(axes?.free||0)+0.3*(axes?.dreamy||0)},
+        {theme:'fire',  v:(axes?.lively||0)+0.2*(axes?.extra||0)},
+        {theme:'earth', v:(axes?.warm||0)+0.2*(1-(axes?.free||0))},
+        {theme:'water', v:(1-(axes?.extra||0))},
+        {theme:'star',  v:(axes?.dreamy||0)+0.2*(axes?.free||0)}
+      ].sort((a,b)=>b.v-a.v);
+      return arr[0].theme;
     }
-
-    document.getElementById('makeStory')?.addEventListener('click', ()=>{
-      const c = drawPoster(1080, 1920);
-      saveCanvasAsPng(c, '별바람_스토리.png');
-    });
-    document.getElementById('makeFeed')?.addEventListener('click', ()=>{
-      const c = drawPoster(1200, 630);
-      saveCanvasAsPng(c, '별바람_피드.png');
-    });
-  })();
+    // 희귀도
+    function pickRarity(weights){
+      const w = weights || {UR:0.05, SR:0.15, R:0.30, C:0.50};
+      const r = Math.random(); let acc=0;
+      for(const k of ["UR","SR","R","C"]){ acc+=w[k]||0; if(r<=acc) return k; }
+      return "C";
+    }
+    // 아이템 선택
+    function pickItem(layer, theme, rarity){
+      const items = layer.items||[];
+      let pool = items.filter(it => it.rarity===rarity && ((it.tags||[]).includes(theme)|| (it.tags||[]).includes("any")));
+      if (!pool.length) pool = items.filter(it => (it.tags||[]).includes(theme) || (it.tags||[]).includes("any"));
+      if (!pool.length) pool = items;
+      if (!pool.length) return null;
+      return pool[Math.floor(Math.random()*pool.length)];
+    }
   </script>
+
+  <!-- 이름/공유/저장 + 포스터 -->
+  <script>
+    function genNameAndMeta(){
+      const p = getPayload();
+      const a = window.NAME_PARTS;
+      const adj = a.adjectives[Math.floor(Math.random()*a.adjectives.length)];
+      const noun = a.nouns[Math.floor(Math.random()*a.nouns.length)];
+      const suf = a.suffixes[Math.floor(Math.random()*a.suffixes.length)];
+      const name = `${adj} ${noun}${suf}`;
+      const nameEl = document.getElementById('nameText');
+      if (nameEl && (!nameEl.textContent || /로딩/i.test(nameEl.textContent))) nameEl.textContent = name;
+      const blurb = document.getElementById('blurb');
+      if (blurb) {
+        blurb.textContent = p?.axes ? '당신의 성향 데이터를 반영해 이름을 만들었어요.' : '임시 조합으로 이름을 만들었어요.';
+      }
+      const tags = document.getElementById('tags');
+      if (tags && p?.axes) {
+        tags.innerHTML = `<span>free:${(p.axes.free*100|0)}%</span><span>extra:${(p.axes.extra*100|0)}%</span>
+          <span>lively:${(p.axes.lively*100|0)}%</span><span>warm:${(p.axes.warm*100|0)}%</span>
+          <span>dreamy:${(p.axes.dreamy*100|0)}%</span>`;
+      }
+    }
+    function setShareAndDownload(){
+      document.getElementById('shareBtn')?.addEventListener('click', async ()=>{
+        try{
+          const url = location.href;
+          if(navigator.share){ await navigator.share({title:'별바람 이름 테스트', text:'내 영혼의 이름을 확인해보세요!', url}); }
+          else { await navigator.clipboard.writeText(url); alert('링크가 복사되었습니다!'); }
+        }catch(e){}
+      });
+      document.getElementById('downloadBtn')?.addEventListener('click', ()=>{
+        const c = document.getElementById('charCanvas');
+        try{
+          const a = document.createElement('a');
+          a.download = 'spirit-name.png';
+          a.href = c.toDataURL('image/png');
+          a.click();
+        }catch(e){ alert('이미지 저장을 지원하지 않는 브라우저예요. 캡처를 사용해 주세요.'); }
+      });
+    }
+    function initPosterButtons(){
+      const srcCanvas = document.getElementById('charCanvas');
+      const nameEl = document.getElementById('nameText');
+      const siteTitle = '별바람 이름 테스트';
+      const siteUrl = 'yogitobi31.github.io';
+      function drawPoster(w, h){
+        const poster = document.createElement('canvas');
+        poster.width = w; poster.height = h;
+        const ctx = poster.getContext('2d');
+        const g = ctx.createLinearGradient(0,0,0,h);
+        g.addColorStop(0, '#fff8e1'); g.addColorStop(1, '#fdebd2');
+        ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+        ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = Math.max(6, Math.round(w*0.006));
+        ctx.strokeRect(ctx.lineWidth/2, ctx.lineWidth/2, w-ctx.lineWidth, h-ctx.lineWidth);
+        ctx.fillStyle = '#7b4f1d'; ctx.font = `bold ${Math.round(w*0.05)}px system-ui, Arial`;
+        ctx.textAlign = 'center'; ctx.fillText(siteTitle, w/2, Math.round(h*0.08));
+        const box = Math.min(w*0.75, h*0.55); const x = (w - box)/2; const y = Math.round(h*0.12);
+        ctx.save(); const r = Math.round(box*0.04); ctx.beginPath();
+        ctx.moveTo(x+r,y); ctx.arcTo(x+box,y,x+box,y+box,r); ctx.arcTo(x+box,y+box,x,y+box,r);
+        ctx.arcTo(x,y+box,x,y,r); ctx.arcTo(x,y,x+box,y,r); ctx.closePath(); ctx.clip();
+        ctx.drawImage(srcCanvas, 0,0,srcCanvas.width,srcCanvas.height, x,y, box,box); ctx.restore();
+        const name = (nameEl?.textContent || '').trim() || '나의 영혼의 이름';
+        ctx.fillStyle = '#1f2937'; ctx.font = `700 ${Math.round(w*0.045)}px system-ui, Arial`;
+        ctx.fillText(name, w/2, y + box + Math.round(h*0.08), w*0.9);
+        ctx.fillStyle = '#6b7280'; ctx.font = `500 ${Math.round(w*0.028)}px system-ui, Arial`;
+        ctx.fillText('나의 성향으로 만든 이름 & 캐릭터', w/2, h - Math.round(h*0.12));
+        ctx.font = `600 ${Math.round(w*0.03)}px system-ui, Arial`; ctx.fillStyle = '#7b4f1d';
+        ctx.fillText(siteUrl, w/2, h - Math.round(h*0.06));
+        return poster;
+      }
+      function saveCanvasAsPng(canvas, filename){
+        const a = document.createElement('a'); a.download = filename; a.href = canvas.toDataURL('image/png'); a.click();
+      }
+      document.getElementById('makeStory')?.addEventListener('click', ()=>{ saveCanvasAsPng(drawPoster(1080,1920),'별바람_스토리.png'); });
+      document.getElementById('makeFeed')?.addEventListener('click', ()=>{ saveCanvasAsPng(drawPoster(1200,630),'별바람_피드.png'); });
+    }
+  </script>
+
+  <!-- 렌더(테마+희귀도) : DOMContentLoaded 이후 실행 -->
+  <script>
+    function renderByRarityTheme(){
+      const cfg = window.CHARACTER_LAYERS;
+      const canvas = document.getElementById('charCanvas');
+      if (!cfg?.layers?.length || !canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      // 결과 축 → 테마, 희귀도
+      let axes=null; try{ axes=getPayload()?.axes||null; }catch(e){}
+      const theme = axes ? pickThemeByAxes(axes) : 'star';
+      const rarity = pickRarity(cfg.rarityWeights);
+
+      // 레이어 선택
+      const picks = (cfg.layers||[]).map(layer=>{
+        if (layer.mode==='optional'){
+          const chance = (typeof layer.chance==='number') ? layer.chance : 0.6;
+          if (Math.random() > chance) return null;
+        }
+        const item = pickItem(layer, theme, rarity);
+        return item ? (item.img||item.src) : null;
+      }).filter(Boolean);
+
+      // 로드 & 합성
+      const imgs=[]; let loaded=0;
+      function finish(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle='#fff8e1'; ctx.fillRect(0,0,canvas.width,canvas.height); // 안전 배경
+        imgs.forEach(img=>img && ctx.drawImage(img,0,0,canvas.width,canvas.height));
+        // 희귀도 배지(임시)
+        const nameEl=document.getElementById('nameText');
+        if (nameEl && !/\[(UR|SR|R|C)\]/.test(nameEl.textContent)) nameEl.textContent += ` [${rarity}]`;
+      }
+      picks.forEach((url,i)=>{
+        const img=new Image();
+        img.onload=()=>{imgs[i]=img; if(++loaded===picks.length) finish();};
+        img.onerror=()=>{if(++loaded===picks.length) finish();};
+        img.src = url + (url.includes('?')?'&':'?') + 'v=' + Date.now();
+      });
+    }
+
+    // 명언(짧은 세트)
+    function renderQuote(){
+      const QUOTES = {
+        earth: [{leader:"Red Cloud (Oglala Lakota)",nation:"Oglala Lakota",
+          quote:"We do not want riches; we want our children trained and brought up properly.",
+          ko:"우리는 부를 원하지 않습니다. 우리 아이들이 제대로 배우고 자라길 원합니다.",
+          source:"Address at Cooper Union (1870)",url:"https://teachingamericanhistory.org/document/address-at-cooper-union-2/"}],
+        water: [{leader:"Chief Joseph (Nez Perce)",nation:"Nez Perce",
+          quote:"From where the sun now stands, I will fight no more forever.",
+          ko:"지금 이 자리에서, 나는 더 이상 싸우지 않겠습니다.",
+          source:"Surrender Statement (1877)",url:"https://teachingamericanhistory.org/document/i-will-fight-no-more-forever/"}],
+        star: [{leader:"Sitting Bull (Hunkpapa Lakota)",nation:"Hunkpapa Lakota",
+          quote:"Let us put our minds together and see what life we can make for our children.",
+          ko:"우리 마음을 모아, 아이들을 위해 어떤 삶을 만들지 생각해 봅시다.",
+          source:"Library of Congress",url:"https://www.loc.gov/pictures/item/2016648134/"}],
+        wind: [{leader:"Luther Standing Bear (Oglala Lakota)",nation:"Oglala Lakota",
+          quote:"The old Lakota was wise. He knew that man's heart, away from nature, becomes hard.",
+          ko:"현명한 라코타는 알았어요. 자연과 멀어질수록 사람의 마음은 굳어진다는 것을.",
+          source:"Land of the Spotted Eagle (1933)",url:"https://en.wikipedia.org/wiki/Luther_Standing_Bear"}],
+        fire: [{leader:"Sarah Winnemucca (Northern Paiute)",nation:"Northern Paiute",
+          quote:"I have nothing to say for myself, only for my people.",
+          ko:"나 자신을 위한 말은 없습니다. 오직 내 사람들을 위한 말만 있습니다.",
+          source:"Life Among the Piutes (1883)",url:"https://archive.org/details/lifeamongpiutesh00sara"}]
+      };
+      let axes=null; try{ axes=getPayload()?.axes||null; }catch(e){}
+      const theme = axes ? pickThemeByAxes(axes) : 'star';
+      const pool = QUOTES[theme] || QUOTES.star;
+      const q = pool[Math.floor(Math.random()*pool.length)];
+      const el = document.getElementById('wisdom');
+      el.innerHTML = `
+        <small>전통의 말 · ${q.nation}</small>
+        <div class="quote-text">“${q.quote}”</div>
+        ${q.ko ? `<div style="font-size:13px;color:#6b7280;margin-top:6px;">${q.ko}</div>` : ``}
+        <div class="quote-footer" style="margin-top:8px;">
+          <div>— ${q.leader}</div>
+          <a href="${q.url}" target="_blank" rel="noopener">출처: ${q.source}</a>
+        </div>`;
+    }
+
+    // DOM 준비 이후에 순서대로 실행 (이게 핵심!)
+    document.addEventListener('DOMContentLoaded', function(){
+      genNameAndMeta();        // 1) 이름/메타 텍스트
+      renderByRarityTheme();   // 2) 캐릭터(테마+희귀도) 렌더
+      renderQuote();           // 3) 명언 카드
+      setShareAndDownload();   // 4) 공유/저장 버튼
+      initPosterButtons();     // 5) 포스터 생성 버튼
+    });
+  </script>
+
+  <!-- (선택) 기존 렌더러가 있다면 마지막에 불러도 됨 -->
+  <!-- <script src="app_result.js"></script> -->
 </body>
 </html>
