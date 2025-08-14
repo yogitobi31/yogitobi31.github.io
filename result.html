@@ -181,17 +181,41 @@
     }
 
     function initButtons(){
-      // 친구도 시켜보기 → 랜딩으로
-      document.getElementById('ctaInvite')?.addEventListener('click', ()=>{ location.href = 'index.html'; });
-      // 결과 저장하기 → 모바일 최적화 전체 포스터
-      document.getElementById('saveFull')?.addEventListener('click', ()=>{
-        const poster = drawFullPoster(1080,1920);
-        const a = document.createElement('a');
-        a.download = '별바람_결과.png';
-        a.href = poster.toDataURL('image/png');
-        a.click();
-      });
-    }
+    // 결과 저장하기 → 모바일 전체 포스터
+    document.getElementById('saveFull')?.addEventListener('click', ()=>{
+      const poster = drawFullPoster(1080,1920);
+      const a = document.createElement('a');
+      a.download = '별바람_결과.png';
+      a.href = poster.toDataURL('image/png');
+      a.click();
+    });
+
+    // 친구도 시켜보기 → 링크 복사 (모바일 공유 API 지원 시 우선 사용)
+    document.getElementById('ctaInvite')?.addEventListener('click', async ()=>{
+      const shareUrl = location.href.includes('?')
+        ? location.href + '&ref=friend'
+        : location.href + '?ref=friend';
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: '별바람 이름 테스트', url: shareUrl });
+          return; // 공유 시 시스템 시트로 안내 끝
+        }
+      } catch(_) { /* fallthrough to clipboard */ }
+
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert('링크가 복사되었습니다!');
+      } catch (e) {
+        // 아주 구형 브라우저용 대체
+        const ta = document.createElement('textarea');
+        ta.value = shareUrl;
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('링크가 복사되었습니다!');
+      }
+    });
+  }
 
     // 텍스트 줄바꿈 유틸
     function wrapText(ctx, text, x, y, maxWidth, lineHeight){
