@@ -4,12 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>결과 - 별바람 이름 테스트</title>
-
-  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 귀여운 캐릭터를 확인해보세요!" />
+  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 캐릭터를 확인해보세요!" />
   <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
-
   <style>
-    :root { --ink:#1f2937; --muted:#6b7280; --brand:#7b4f1d; --card:#fffaf0; --line:#ffe4b5; }
+    :root { --ink:#1f2937; --muted:#6b7280; --brand:#ef6b8c; --card:#fffaf0; --line:#ffe4b5; }
     html,body{margin:0;padding:0;background:#fefcf8;color:var(--ink);
       font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
     .container{max-width:1024px;margin:0 auto;padding:16px}
@@ -21,8 +19,8 @@
     @media (max-width:900px){ .grid{grid-template-columns:1fr} }
     canvas{max-width:100%;border-radius:12px;background:#fff}
     .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:600}
-    .btn.primary{background:#ef6b8c;color:#fff;box-shadow:0 6px 14px rgba(239,107,140,.25)}
+    .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:700}
+    .btn.primary{background:var(--brand);color:#fff;box-shadow:0 6px 14px rgba(239,107,140,.25)}
     .btn.ghost{background:#f3f4f6}
     .tags{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
     .tags span{background:#f3f4f6;border-radius:999px;padding:6px 10px;font-size:12px;color:#374151}
@@ -30,9 +28,8 @@
     .quote-card small{color:#9CA3AF;letter-spacing:.3px}
     .quote-text{font-size:18px;line-height:1.5;font-weight:600;color:#374151;margin:10px 0}
     .quote-footer{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .quote-footer a{font-size:12px;color:#2563EB;text-decoration:underline;white-space:nowrap}
+    .ad-placeholder{text-align:center;color:#9CA3AF;padding:12px 0;border:1px dashed #e5e7eb;border-radius:10px;margin-top:12px}
     .tip{font-size:12px;color:#9CA3AF;margin-top:8px}
-    .ad-placeholder{text-align:center;color:#9CA3AF;padding:12px 0;border:1px dashed #e5e7eb;border-radius:10px}
     .err{position:fixed;left:8px;right:8px;bottom:8px;background:#fff3cd;color:#111;border:1px solid #ffecb5;border-radius:10px;padding:10px;font-size:12px;z-index:9999}
   </style>
 </head>
@@ -47,7 +44,6 @@
       <div>
         <canvas id="charCanvas" width="900" height="900"></canvas>
         <div class="btn-row">
-          <!-- 남기는 버튼 2개 -->
           <button class="btn primary" id="saveFull">결과 저장하기</button>
           <button class="btn ghost" id="ctaInvite">친구도 시켜보기</button>
         </div>
@@ -59,7 +55,7 @@
         <p id="blurb">성향을 분석 중…</p>
         <div id="tags" class="tags"></div>
         <section id="wisdom" class="quote-card"></section>
-        <div style="margin-top:12px" class="ad-placeholder">여기에 광고가 표시됩니다</div>
+        <div class="ad-placeholder">여기에 광고가 표시됩니다</div>
       </div>
     </div>
   </main>
@@ -76,20 +72,20 @@
   <script src="data/name_parts.js"></script>
   <script src="data/character_layers.js"></script>
 
-  <!-- 안전장치/유틸 + 데이터 -->
+  <!-- 안전장치/유틸 & 기본 데이터 -->
   <script>
-    // 오류 박스
+    // 오류 박스(개발용)
     window.onerror = function(msg, src, line, col){
       const box = document.createElement('div');
       box.className = 'err';
       box.innerHTML = '<b>오류 감지</b><br>'+ msg + '<br><small>'+ (src||'inline') +':'+ (line||0) +':'+ (col||0) +'</small>';
       document.body.appendChild(box);
     };
-    // 결과 데이터
-    function getPayload(){
-      try{const p=JSON.parse(localStorage.getItem('resultPayload')||'null');return p&&typeof p==='object'?p:null;}catch(e){return null;}
-    }
-    // SHIMs
+
+    // 결과 payload
+    function getPayload(){ try{const p=JSON.parse(localStorage.getItem('resultPayload')||'null');return p&&typeof p==='object'?p:null;}catch(e){return null;} }
+
+    // SHIMs (외부 없을 때도 동작)
     window.NAME_PARTS = window.NAME_PARTS || {
       adjectives:["불꽃같은","고요한","자유로운","빛나는","은은한","맑은","빠른","단단한","따스한","깊은"],
       nouns:["매","사슴","늑대","곰","여우","강","바람","별빛","해오라기","자작나무"],
@@ -157,7 +153,7 @@
     }
   </script>
 
-  <!-- 이름/버튼/포스터 생성 -->
+  <!-- 이름/명언/포스터/버튼 -->
   <script>
     function genNameAndMeta(){
       const p = getPayload();
@@ -180,66 +176,25 @@
       }
     }
 
-    function initButtons(){
-    // 결과 저장하기 → 모바일 전체 포스터
-    document.getElementById('saveFull')?.addEventListener('click', ()=>{
-      const poster = drawFullPoster(1080,1920);
-      const a = document.createElement('a');
-      a.download = '별바람_결과.png';
-      a.href = poster.toDataURL('image/png');
-      a.click();
-    });
-
-    // 친구도 시켜보기 → 링크 복사 (모바일 공유 API 지원 시 우선 사용)
-    document.getElementById('ctaInvite')?.addEventListener('click', async ()=>{
-      const shareUrl = location.href.includes('?')
-        ? location.href + '&ref=friend'
-        : location.href + '?ref=friend';
-      try {
-        if (navigator.share) {
-          await navigator.share({ title: '별바람 이름 테스트', url: shareUrl });
-          return; // 공유 시 시스템 시트로 안내 끝
-        }
-      } catch(_) { /* fallthrough to clipboard */ }
-
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        alert('링크가 복사되었습니다!');
-      } catch (e) {
-        // 아주 구형 브라우저용 대체
-        const ta = document.createElement('textarea');
-        ta.value = shareUrl;
-        document.body.appendChild(ta);
-        ta.select(); document.execCommand('copy');
-        document.body.removeChild(ta);
-        alert('링크가 복사되었습니다!');
-      }
-    });
-  }
-
-    // 텍스트 줄바꿈 유틸
+    // 텍스트 줄바꿈
     function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-      const words = text.split(' ');
-      let line = '';
-      const lines = [];
+      const words = text.split(' '); let line=''; const lines=[];
       for (let n=0; n<words.length; n++) {
-        const testLine = line + (line? ' ' : '') + words[n];
-        const w = ctx.measureText(testLine).width;
-        if (w > maxWidth && n>0) { lines.push(line); line = words[n]; }
-        else { line = testLine; }
+        const test = line + (line?' ':'') + words[n];
+        if (ctx.measureText(test).width > maxWidth && n>0){ lines.push(line); line = words[n]; }
+        else line = test;
       }
       lines.push(line);
-      lines.forEach((ln,i)=>{ ctx.fillText(ln, x, y + i*lineHeight); });
-      return y + lines.length * lineHeight;
+      lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight));
+      return y + lines.length*lineHeight;
     }
 
-    // 모바일 전체 포스터(캐릭터+이름+태그+명언+사이트)
+    // 모바일 전체 포스터(1080x1920)
     function drawFullPoster(W,H){
       const srcCanvas = document.getElementById('charCanvas');
       const name = (document.getElementById('nameText')?.textContent || '나의 영혼의 이름').trim();
       const quoteEl = document.getElementById('wisdom');
       const raw = quoteEl?.textContent || '';
-      // 영문 인용구만 대략 추출
       const quoteMatch = raw.match(/“([^”]+)”/);
       const quote = quoteMatch ? quoteMatch[1] : raw.replace(/\s+/g,' ').slice(0,120);
       const siteTitle = '별바람 이름 테스트';
@@ -248,19 +203,16 @@
       const c = document.createElement('canvas'); c.width=W; c.height=H;
       const ctx = c.getContext('2d');
 
-      // 배경 그라데이션
       const g = ctx.createLinearGradient(0,0,0,H);
-      g.addColorStop(0, '#fff8e1'); g.addColorStop(1, '#fdebd2');
-      ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+      g.addColorStop(0,'#fff8e1'); g.addColorStop(1,'#fdebd2');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
 
-      // 상단 타이틀
-      ctx.fillStyle = '#7b4f1d'; ctx.textAlign='center';
-      ctx.font = `bold ${Math.round(W*0.054)}px system-ui, Arial`;
+      ctx.fillStyle='#ef6b8c'; ctx.textAlign='center';
+      ctx.font=`bold ${Math.round(W*0.054)}px system-ui,Arial`;
       ctx.fillText(siteTitle, W/2, Math.round(H*0.075));
 
-      // 캐릭터 박스 (라운드)
       const box = Math.min(W*0.78, H*0.50);
-      const x = (W - box)/2; const y = Math.round(H*0.11);
+      const x = (W-box)/2, y = Math.round(H*0.11);
       ctx.save();
       const r = Math.round(box*0.04);
       ctx.beginPath();
@@ -270,26 +222,20 @@
       ctx.arcTo(x,y+box,x,y,r);
       ctx.arcTo(x,y,x+box,y,r);
       ctx.closePath(); ctx.clip();
-      ctx.drawImage(srcCanvas, 0,0,srcCanvas.width,srcCanvas.height, x,y, box,box);
+      ctx.drawImage(srcCanvas,0,0,srcCanvas.width,srcCanvas.height,x,y,box,box);
       ctx.restore();
 
-      // 이름
-      ctx.fillStyle = '#1f2937'; ctx.textAlign='center';
-      ctx.font = `800 ${Math.round(W*0.06)}px system-ui, Arial`;
-      ctx.fillText(name, W/2, y + box + Math.round(H*0.09), W*0.9);
+      ctx.fillStyle='#1f2937'; ctx.textAlign='center';
+      ctx.font=`800 ${Math.round(W*0.06)}px system-ui,Arial`;
+      ctx.fillText(name, W/2, y+box+Math.round(H*0.09), W*0.9);
 
-      // 부제
-      ctx.fillStyle = '#6b7280';
-      ctx.font = `500 ${Math.round(W*0.036)}px system-ui, Arial`;
-      ctx.fillText('나의 성향으로 만든 이름 & 캐릭터', W/2, y + box + Math.round(H*0.14));
+      ctx.fillStyle='#6b7280';
+      ctx.font=`500 ${Math.round(W*0.036)}px system-ui,Arial`;
+      ctx.fillText('나의 성향으로 만든 이름 & 캐릭터', W/2, y+box+Math.round(H*0.14));
 
-      // 인용구 카드(가운데 정렬)
-      const cardW = Math.round(W*0.84);
-      const cardH = Math.round(H*0.20);
-      const cardX = (W-cardW)/2;
-      const cardY = y + box + Math.round(H*0.16);
-      // 카드 배경
-      ctx.fillStyle = '#fffaf0'; ctx.strokeStyle='#ffe4b5'; ctx.lineWidth=4;
+      const cardW=Math.round(W*0.84), cardH=Math.round(H*0.20);
+      const cardX=(W-cardW)/2, cardY=y+box+Math.round(H*0.16);
+      ctx.fillStyle='#fffaf0'; ctx.strokeStyle='#ffe4b5'; ctx.lineWidth=4;
       ctx.beginPath(); const cr=24;
       ctx.moveTo(cardX+cr,cardY);
       ctx.arcTo(cardX+cardW,cardY,cardX+cardW,cardY+cardH,cr);
@@ -298,22 +244,49 @@
       ctx.arcTo(cardX,cardY,cardX+cardW,cardY,cr);
       ctx.closePath(); ctx.fill(); ctx.stroke();
 
-      // 인용구 텍스트
       ctx.fillStyle='#374151'; ctx.textAlign='left';
-      const innerX = cardX + 24; const innerY = cardY + 32; const innerW = cardW - 48;
-      ctx.font = `700 ${Math.round(W*0.04)}px system-ui, Arial`;
-      const nextY = wrapText(ctx, `“${quote}”`, innerX, innerY, innerW, Math.round(W*0.055));
+      const innerX=cardX+24, innerY=cardY+32, innerW=cardW-48;
+      ctx.font=`700 ${Math.round(W*0.04)}px system-ui,Arial`;
+      wrapText(ctx, `“${quote}”`, innerX, innerY, innerW, Math.round(W*0.055));
 
-      // 사이트 URL 하단
-      ctx.textAlign='center'; ctx.fillStyle='#7b4f1d';
-      ctx.font = `700 ${Math.round(W*0.038)}px system-ui, Arial`;
+      ctx.textAlign='center'; ctx.fillStyle='#ef6b8c';
+      ctx.font=`700 ${Math.round(W*0.038)}px system-ui,Arial`;
       ctx.fillText(siteUrl, W/2, H - Math.round(H*0.05));
 
       return c;
     }
+
+    // 버튼 동작: 저장/초대(링크 복사 or 공유 시트)
+    async function initButtons(){
+      document.getElementById('saveFull')?.addEventListener('click', ()=>{
+        const poster = drawFullPoster(1080,1920);
+        const a = document.createElement('a');
+        a.download = '별바람_결과.png';
+        a.href = poster.toDataURL('image/png');
+        a.click();
+      });
+
+      document.getElementById('ctaInvite')?.addEventListener('click', async ()=>{
+        const shareUrl = location.href.includes('?') ? location.href + '&ref=friend' : location.href + '?ref=friend';
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: '별바람 이름 테스트', text:'나도 해봤더니 재밌어!', url: shareUrl });
+            return;
+          }
+        } catch(_) { /* fallback */ }
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          alert('링크가 복사되었습니다!');
+        } catch(e){
+          const ta=document.createElement('textarea'); ta.value=shareUrl;
+          document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+          alert('링크가 복사되었습니다!');
+        }
+      });
+    }
   </script>
 
-  <!-- 렌더(테마+희귀도) + 초기화 -->
+  <!-- 캐릭터 렌더(테마+희귀도) & 명언 -->
   <script>
     function renderByRarityTheme(){
       const cfg = window.CHARACTER_LAYERS;
@@ -389,14 +362,12 @@
     }
 
     document.addEventListener('DOMContentLoaded', function(){
-      genNameAndMeta();        // 1) 이름/메타
-      renderByRarityTheme();   // 2) 캐릭터 렌더
-      renderQuote();           // 3) 명언
-      initButtons();           // 4) 버튼(저장/초대)
+      genNameAndMeta();        // 1) 이름/텍스트
+      renderByRarityTheme();   // 2) 캐릭터 합성
+      renderQuote();           // 3) 명언 카드
+      initButtons();           // 4) 저장/초대
     });
   </script>
-
-  <!-- (선택) 기존 렌더러가 있다면 마지막에 불러도 됨 -->
-  <!-- <script src="app_result.js"></script> -->
 </body>
 </html>
+
