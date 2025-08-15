@@ -256,7 +256,7 @@
       return c;
     }
 
-    // 버튼 동작: 저장/초대(링크 복사 or 공유 시트)
+    // 버튼 동작: 저장/초대(첫 화면 링크 공유/복사)
     async function initButtons(){
       document.getElementById('saveFull')?.addEventListener('click', ()=>{
         const poster = drawFullPoster(1080,1920);
@@ -267,18 +267,19 @@
       });
 
       document.getElementById('ctaInvite')?.addEventListener('click', async ()=>{
-        const shareUrl = location.href.includes('?') ? location.href + '&ref=friend' : location.href + '?ref=friend';
+        // 첫 화면(랜딩) URL만 고정으로 공유/복사
+        const landingUrl = 'https://yogitobi31.github.io/'; // 필요하면 프로젝트 페이지에 맞춰 변경
         try {
           if (navigator.share) {
-            await navigator.share({ title: '별바람 이름 테스트', text:'나도 해봤더니 재밌어!', url: shareUrl });
+            await navigator.share({ title: '별바람 이름 테스트', text: '나도 해봤더니 재밌어!', url: landingUrl });
             return;
           }
         } catch(_) { /* fallback */ }
         try {
-          await navigator.clipboard.writeText(shareUrl);
+          await navigator.clipboard.writeText(landingUrl);
           alert('링크가 복사되었습니다!');
         } catch(e){
-          const ta=document.createElement('textarea'); ta.value=shareUrl;
+          const ta=document.createElement('textarea'); ta.value=landingUrl;
           document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
           alert('링크가 복사되었습니다!');
         }
@@ -365,9 +366,8 @@
       genNameAndMeta();        // 1) 이름/텍스트
       renderByRarityTheme();   // 2) 캐릭터 합성
       renderQuote();           // 3) 명언 카드
-      initButtons();           // 4) 저장/초대
+      initButtons();           // 4) 저장/초대(첫 화면 공유)
     });
   </script>
 </body>
 </html>
-
