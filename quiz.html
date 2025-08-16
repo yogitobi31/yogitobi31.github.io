@@ -3,127 +3,251 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>테스트 시작 | 별바람</title>
+<title>별바람 테스트 시작</title>
+<meta name="description" content="15문항 성향 기반, 나만의 이름과 카드 포스터를 만나보세요."/>
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
 <style>
-  :root{--ink:#1f2937;--muted:#6b7280;--brand:#ef6b8c;--bg:#fffdf8}
+  :root{
+    --ink:#1f2937; --muted:#6b7280; --brand:#ef6b8c; --bg:#fffdf8; --card:#ffffff;
+    --line:#f1f5f9; --ok:#10b981; --warn:#f59e0b;
+  }
+  *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
-  .container{max-width:900px;margin:0 auto;padding:20px 16px}
-  .card{background:#fff;border:1px solid #eee;border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-  h1{margin:0 0 8px} .subtle{color:var(--muted);margin:0 0 14px}
-  .q{margin:16px 0;padding:14px;border:1px solid #eee;border-radius:12px}
-  .q h3{margin:0 0 10px;font-size:16px}
-  .scale{display:flex;gap:8px;flex-wrap:wrap}
-  label.scale-item{display:flex;align-items:center;gap:6px;background:#f8fafc;border:1px solid #e5e7eb;padding:8px 10px;border-radius:10px;cursor:pointer}
-  .btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-  .btn.primary{background:var(--brand);color:#fff;box-shadow:0 6px 14px rgba(239,107,140,.25)}
+    font-family:system-ui,-apple-system,"Noto Sans KR","Apple SD Gothic Neo",Roboto,Arial,sans-serif}
+  a{color:#2563EB;text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  .container{max-width:960px;margin:0 auto;padding:20px 16px}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand{font-weight:900;letter-spacing:.2px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;
+        box-shadow:0 10px 24px rgba(0,0,0,.06)}
+
+  .hero{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:center}
+  @media (max-width:900px){.hero{grid-template-columns:1fr}}
+
+  .title{font-size:26px;margin:0 0 6px}
+  .lead{color:var(--muted);margin:0 0 12px}
+
+  /* Progress */
+  .progress{height:10px;background:#fff;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .bar{height:100%;width:0%;background:linear-gradient(90deg,#ef6b8c,#f6ad55);transition:width .35s ease}
+
+  /* Q pager */
+  .qwrap{margin-top:14px;min-height:320px;position:relative}
+  .qcard{border:1px solid var(--line);border-radius:16px;padding:18px;background:#fff;box-shadow:0 8px 18px rgba(0,0,0,.05);
+         position:absolute;inset:0;opacity:0;transform:translateY(10px);pointer-events:none;transition:.28s ease}
+  .qcard.active{opacity:1;transform:translateY(0);pointer-events:auto}
+  .qhead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .qindex{font-weight:800;color:#ef6b8c}
+  .qtext{font-size:18px;margin:12px 0 14px}
+
+  /* Scale pills */
+  .scale{display:flex;flex-wrap:wrap;gap:10px}
+  input[type="radio"]{display:none}
+  .pill{display:flex;align-items:center;gap:8px;padding:12px 14px;border-radius:14px;border:1.5px solid #e5e7eb;
+        background:#f9fafb;cursor:pointer;font-weight:700;user-select:none;transition:.2s ease}
+  .pill .em{font-size:18px}
+  input[type="radio"]:checked + .pill{border-color:#ef6b8c;background:#fff;box-shadow:0 6px 14px rgba(239,107,140,.18)}
+
+  /* Actions */
+  .actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .btn{border:0;border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer}
+  .btn.primary{background:var(--brand);color:#fff;box-shadow:0 10px 20px rgba(239,107,140,.25)}
   .btn.ghost{background:#f3f4f6}
-  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
   .hint{font-size:12px;color:#9CA3AF;margin-top:8px}
-  .err{color:#b91c1c;font-weight:600;margin-top:8px}
+  .err{display:none;margin-top:8px;color:#b91c1c;font-weight:700}
+
+  /* Footer */
+  footer{margin:26px 0 40px;color:#9CA3AF;text-align:center}
 </style>
 </head>
 <body>
-  <header class="container">
-    <h1>별바람 이름 테스트</h1>
-    <p class="subtle">15문항 · 약 1분 · 결과는 내 기기에만 저장됩니다</p>
-  </header>
+  <div class="container">
+    <header>
+      <div class="brand">⭐ 별바람</div>
+      <nav class="badges" style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="badge" href="index.html">홈</a>
+        <a class="badge" href="privacy.html">개인정보</a>
+        <a class="badge" href="terms.html">약관</a>
+      </nav>
+    </header>
 
-  <main class="container card">
-    <form id="form">
-      <div id="questions"></div>
-      <div class="actions">
-        <button type="submit" class="btn primary">결과 보기</button>
-        <a class="btn ghost" href="index.html">홈으로</a>
+    <section class="hero">
+      <div class="card">
+        <h1 class="title">나의 성향으로 탄생하는 이름 ✨</h1>
+        <p class="lead">15문항 · 약 1분 · 결과는 내 기기에만 저장됩니다. 완료하면 <b>고해상도 카드 포스터</b>를 받을 수 있어요.</p>
+        <div class="progress" aria-label="진행도">
+          <div id="bar" class="bar" style="width:0%"></div>
+        </div>
+
+        <div class="qwrap" id="qwrap">
+          <!-- 질문 카드가 JS로 들어옵니다 -->
+        </div>
+
+        <div class="actions">
+          <button class="btn ghost" id="prevBtn" type="button">← 이전</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="skipBtn" type="button" style="background:#fff;border:1px solid #e5e7eb">건너뛰기</button>
+            <button class="btn primary" id="nextBtn" type="button">다음 →</button>
+            <button class="btn primary" id="submitBtn" type="button" style="display:none">결과 보기</button>
+          </div>
+        </div>
+        <div id="err" class="err">모든 문항에 응답해 주세요.</div>
+        <div class="hint">* 응답은 서버로 전송되지 않으며, 브라우저 로컬저장소에만 저장됩니다.</div>
       </div>
-      <div id="err" class="err" style="display:none;">모든 문항에 응답해 주세요.</div>
-      <div class="hint">* 광고/서버로 응답이 전송되지 않으며, 결과는 브라우저(로컬 저장소)에 보관됩니다.</div>
-    </form>
-  </main>
+
+      <div aria-hidden="true">
+        <img src="assets/og_default.png" alt="" style="width:100%;border-radius:18px;border:1px solid #eee;box-shadow:0 8px 20px rgba(0,0,0,.06)"/>
+        <div style="margin-top:10px;color:#6b7280;font-size:14px">
+          <b>팁:</b> 너무 고민하지 말고 <u>첫 느낌</u>대로 선택하면 더 재밌어요!
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>© 별바람</footer>
 
   <script>
-    // 15문항 정의 (각 문항은 어느 축에 기여하는지 axis로 표시)
+    // ===== 질문 정의 (축 매핑 동일) =====
     const ITEMS = [
       { id:'q1',  axis:'free',   text:'새로운 장소를 즉흥적으로 떠나는 편이다.' },
       { id:'q2',  axis:'extra',  text:'처음 만나는 사람과도 쉽게 대화한다.' },
       { id:'q3',  axis:'lively', text:'하루에 해야 할 일을 빠른 속도로 처리한다.' },
       { id:'q4',  axis:'warm',   text:'가까운 사람들의 감정 변화에 민감하다.' },
       { id:'q5',  axis:'dreamy', text:'공상/상상을 자주 하고 즐긴다.' },
-
       { id:'q6',  axis:'free',   text:'계획보다 흐름을 따르는 편이다.' },
       { id:'q7',  axis:'extra',  text:'모임에서 이야기의 중심이 되는 편이다.' },
       { id:'q8',  axis:'lively', text:'활동적인 취미를 선호한다.' },
       { id:'q9',  axis:'warm',   text:'돌봄/배려가 중요한 가치라고 느낀다.' },
       { id:'q10', axis:'dreamy', text:'예술/감성 콘텐츠를 즐겨 감상한다.' },
-
       { id:'q11', axis:'free',   text:'새 규칙을 보면 개선 아이디어가 먼저 떠오른다.' },
       { id:'q12', axis:'extra',  text:'단체 활동에서 에너지를 얻는다.' },
       { id:'q13', axis:'lively', text:'해야 할 일을 미루는 편이 아니다.' },
       { id:'q14', axis:'warm',   text:'충돌보다 화해를 우선한다.' },
-      { id:'q15', axis:'dreamy', text:'밤하늘/자연을 보며 생각에 잠기곤 한다.' },
+      { id:'q15', axis:'dreamy', text:'밤하늘/자연을 보며 생각에 잠기곤 한다.' }
+    ];
+    const SCALE = [
+      {v:1, em:'😶',  label:'전혀 아니다'},
+      {v:2, em:'🙁',  label:'아닌 편'},
+      {v:3, em:'😐',  label:'보통'},
+      {v:4, em:'🙂',  label:'그런 편'},
+      {v:5, em:'😁',  label:'매우 그렇다'},
     ];
 
-    const SCALE = [1,2,3,4,5]; // 매우 아니다(1) ~ 매우 그렇다(5)
+    // ===== 렌더링 =====
+    const wrap = document.getElementById('qwrap');
+    let cur = 0;
+    const answers = {}; // id -> 1~5
 
-    // 문항 렌더
-    const box = document.getElementById('questions');
-    ITEMS.forEach((it,idx)=>{
+    function makeCard(it, idx){
       const div = document.createElement('div');
-      div.className = 'q';
+      div.className = 'qcard' + (idx===0 ? ' active' : '');
+      div.setAttribute('data-idx', idx);
       div.innerHTML = `
-        <h3>${idx+1}. ${it.text}</h3>
+        <div class="qhead">
+          <div class="qindex">Q${idx+1} / ${ITEMS.length}</div>
+        </div>
+        <div class="qtext">${it.text}</div>
         <div class="scale">
-          ${SCALE.map(v => `
-            <label class="scale-item">
-              <input type="radio" name="${it.id}" value="${v}" required>
-              <span>${v}</span>
+          ${SCALE.map(s => `
+            <label>
+              <input type="radio" name="${it.id}" value="${s.v}">
+              <span class="pill"><span class="em">${s.em}</span>${s.label}</span>
             </label>
           `).join('')}
         </div>
       `;
-      box.appendChild(div);
-    });
+      // 기존 응답 복원
+      div.querySelectorAll('input[type="radio"]').forEach(inp=>{
+        inp.addEventListener('change', ()=>{
+          answers[it.id] = Number(inp.value);
+          updateButtons();
+        });
+        if (answers[it.id] && Number(inp.value)===answers[it.id]) inp.checked = true;
+      });
+      return div;
+    }
 
-    // 축 계산: 각 축 3문항 평균 → 0~1 정규화
-    function computeAxes(formData){
+    function renderAll(){
+      wrap.innerHTML = '';
+      ITEMS.forEach((it,idx)=>wrap.appendChild(makeCard(it, idx)));
+      updateProgress(); updateButtons();
+    }
+
+    function show(idx){
+      cur = Math.max(0, Math.min(ITEMS.length-1, idx));
+      document.querySelectorAll('.qcard').forEach((el,i)=>{
+        el.classList.toggle('active', i===cur);
+      });
+      updateProgress(); updateButtons();
+    }
+
+    function updateProgress(){
+      const bar = document.getElementById('bar');
+      const done = Object.keys(answers).length;
+      const base = Math.max(done, cur); // 현재 카드에 도달한 만큼 표시
+      const p = Math.round((base)/ITEMS.length*100);
+      bar.style.width = p + '%';
+    }
+
+    function updateButtons(){
+      document.getElementById('prevBtn').disabled = (cur===0);
+      document.getElementById('skipBtn').style.display = (answers[ITEMS[cur].id] ? 'none':'inline-flex');
+      const last = (cur===ITEMS.length-1);
+      document.getElementById('nextBtn').style.display = last ? 'none':'inline-flex';
+      document.getElementById('submitBtn').style.display = last ? 'inline-flex':'none';
+      document.getElementById('err').style.display = 'none';
+    }
+
+    // ===== 계산/저장 =====
+    function computeAxes(){
       const sums = {free:0, extra:0, lively:0, warm:0, dreamy:0};
       const counts = {free:0, extra:0, lively:0, warm:0, dreamy:0};
       for (const it of ITEMS){
-        const v = Number(formData.get(it.id)||0);
+        const v = Number(answers[it.id]||0);
         if (!v) continue;
-        sums[it.axis] += v; counts[it.axis] += 1;
+        sums[it.axis]+=v; counts[it.axis]+=1;
       }
       const axes = {};
       for (const k of Object.keys(sums)){
-        const avg = counts[k] ? (sums[k]/counts[k]) : 3; // 기본값 3
-        const norm = (avg - 1) / 4; // 1~5 → 0~1
+        const avg = counts[k] ? (sums[k]/counts[k]) : 3;
+        const norm = (avg-1)/4; // 1~5 → 0~1
         axes[k] = Math.max(0, Math.min(1, norm));
       }
       return axes;
     }
 
-    // 제출
-    document.getElementById('form').addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const fd = new FormData(e.currentTarget);
-      // 모든 문항 체크
-      for (const it of ITEMS){
-        if (!fd.get(it.id)){
-          document.getElementById('err').style.display='block';
-          return;
-        }
+    function submit(){
+      // 검증: 하나라도 빠지면 경고
+      const missing = ITEMS.filter(it=>!answers[it.id]).length;
+      if (missing>0){
+        document.getElementById('err').style.display='block';
+        return;
       }
-      document.getElementById('err').style.display='none';
-
-      const axes = computeAxes(fd);
-      const payload = { axes, ts: Date.now() };
-      try{
-        localStorage.setItem('resultPayload', JSON.stringify(payload));
-      }catch(_){}
-
-      // 결과 페이지로 이동
+      const payload = { axes: computeAxes(), ts: Date.now() };
+      try{ localStorage.setItem('resultPayload', JSON.stringify(payload)); }catch(_){}
       location.href = 'result.html';
+    }
+
+    // ===== 이벤트 =====
+    document.getElementById('prevBtn').addEventListener('click', ()=>show(cur-1));
+    document.getElementById('nextBtn').addEventListener('click', ()=>{
+      // 현재 카드 응답 없으면 살짝 흔들기 대신 경고
+      if (!answers[ITEMS[cur].id]) {
+        document.getElementById('err').style.display='block';
+        return;
+      }
+      show(cur+1);
     });
+    document.getElementById('skipBtn').addEventListener('click', ()=>show(cur+1));
+    document.getElementById('submitBtn').addEventListener('click', submit);
+
+    // 최초 렌더
+    renderAll();
+
+    // 뒤로가기 시 스크롤 맨 위
+    window.history.scrollRestoration = 'manual';
   </script>
 </body>
 </html>
