@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>결과 - 별바람 이름 테스트</title>
-  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 캐릭터를 확인해보세요!" />
+  <meta name="description" content="나의 성향으로 탄생한 영혼의 이름과 카드 포스터" />
   <link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png" />
   <style>
     :root { --ink:#1f2937; --muted:#6b7280; --brand:#ef6b8c; --card:#fffaf0; --line:#ffe4b5; }
@@ -17,7 +17,6 @@
     .subtle{color:var(--muted);margin:0 0 14px;font-size:14px}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
     @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-    canvas{max-width:100%;border-radius:12px;background:#fff}
     .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:700}
     .btn.primary{background:var(--brand);color:#fff;box-shadow:0 6px 14px rgba(239,107,140,.25)}
@@ -31,23 +30,87 @@
     .ad-placeholder{text-align:center;color:#9CA3AF;padding:12px 0;border:1px dashed #e5e7eb;border-radius:10px;margin-top:12px}
     .tip{font-size:12px;color:#9CA3AF;margin-top:8px}
     .err{position:fixed;left:8px;right:8px;bottom:8px;background:#fff3cd;color:#111;border:1px solid #ffecb5;border-radius:10px;padding:10px;font-size:12px;z-index:9999}
+
+    /* === FX 오버레이 (희귀도별 화면 이펙트) === */
+    .artwrap{position:relative}
+    .artwrap canvas{display:block;max-width:100%;border-radius:12px;background:#fff}
+    .fx{position:absolute;inset:0;pointer-events:none;border-radius:12px;overflow:hidden}
+    .fx .ring,.fx .sparkles,.fx .aurora{position:absolute;inset:-2%}
+    .fx .ring{
+      background: conic-gradient(from 0deg,
+        rgba(255,215,0,0) 0%,
+        rgba(255,215,0,0.55) 15%,
+        rgba(255,215,0,0) 30%,
+        rgba(255,215,0,0.7) 50%,
+        rgba(255,215,0,0) 100%);
+      filter: blur(6px);
+      animation: spin 8s linear infinite;
+      opacity:.0;border-radius:12px;
+    }
+    .fx .sparkles{
+      background-image:
+        radial-gradient(rgba(255,255,255,.9) 0 1px, rgba(255,255,255,0) 2px),
+        radial-gradient(rgba(255,255,255,.5) 0 1px, rgba(255,255,255,0) 2px);
+      background-size: 120px 120px, 180px 180px;
+      background-position: 0 0, 60px 90px;
+      animation: twinkle 2.2s ease-in-out infinite;
+      opacity:.0;
+    }
+    .fx .aurora{
+      background: radial-gradient(120% 80% at 0% 0%, rgba(255,215,0,.20), rgba(255,215,0,0) 60%),
+                  radial-gradient(120% 80% at 100% 100%, rgba(255,105,180,.18), rgba(255,105,180,0) 60%),
+                  radial-gradient(120% 80% at 0% 100%, rgba(135,206,250,.16), rgba(135,206,250,0) 60%);
+      mix-blend-mode: screen;
+      animation: drift 9s ease-in-out infinite alternate;
+      opacity:.0;border-radius:12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes twinkle {
+      0%,100% { opacity:.2; filter: drop-shadow(0 0 6px rgba(255,255,255,.35)); }
+      50%     { opacity:1;  filter: drop-shadow(0 0 10px rgba(255,255,255,.6)); }
+    }
+    @keyframes drift {
+      0% { transform: translate(-2%, -2%) scale(1.02); }
+      100% { transform: translate(2%, 2%) scale(1.06); }
+    }
+    .fx[data-rarity="C"]  .sparkles{opacity:.15}
+    .fx[data-rarity="R"]  .sparkles{opacity:.35}
+    .fx[data-rarity="SR"] .sparkles{opacity:.65}
+    .fx[data-rarity="UR"] .sparkles{opacity:.85}
+    .fx[data-rarity="R"]  .ring{opacity:.15}
+    .fx[data-rarity="SR"] .ring{opacity:.35}
+    .fx[data-rarity="UR"] .ring{opacity:.75}
+    .fx[data-rarity="SR"] .aurora{opacity:.25}
+    .fx[data-rarity="UR"] .aurora{opacity:.55}
+    @media (max-width: 420px){
+      .fx .ring{filter: blur(4px)}
+      .fx .sparkles{background-size:100px 100px, 150px 150px}
+    }
   </style>
 </head>
 <body>
   <header class="container">
     <h1>당신의 결과</h1>
-    <p class="subtle">성향 분석을 바탕으로 탄생한 영혼의 이름과 캐릭터</p>
+    <p class="subtle">성향 분석을 바탕으로 탄생한 영혼의 이름과 카드 포스터</p>
   </header>
 
   <main class="container card">
     <div class="grid">
       <div>
-        <canvas id="charCanvas" width="900" height="900"></canvas>
+        <div class="artwrap">
+          <canvas id="charCanvas" width="900" height="900"></canvas>
+          <!-- 화면용 희귀도 이펙트 레이어 -->
+          <div id="fxLayer" class="fx" aria-hidden="true">
+            <div class="ring"></div>
+            <div class="sparkles"></div>
+            <div class="aurora"></div>
+          </div>
+        </div>
         <div class="btn-row">
           <button class="btn primary" id="saveFull">결과 저장하기</button>
           <button class="btn ghost" id="ctaInvite">친구도 시켜보기</button>
         </div>
-        <div class="tip">* 저장한 이미지는 인스타/카톡 스토리에 최적화되어요.</div>
+        <div class="tip">* 저장 이미지는 인스타/카톡 스토리에 맞춘 고해상도(1080×1920)입니다.</div>
       </div>
 
       <div>
@@ -68,11 +131,10 @@
     <a href="index.html">다시 테스트하기</a> · <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a>
   </footer>
 
-  <!-- (있으면 사용) 외부 리소스 -->
+  <!-- 외부 리소스가 있으면 사용 -->
   <script src="data/name_parts.js"></script>
   <script src="data/character_layers.js"></script>
 
-  <!-- 안전장치/유틸 & 기본 데이터 -->
   <script>
     // 오류 박스(개발용)
     window.onerror = function(msg, src, line, col){
@@ -81,11 +143,10 @@
       box.innerHTML = '<b>오류 감지</b><br>'+ msg + '<br><small>'+ (src||'inline') +':'+ (line||0) +':'+ (col||0) +'</small>';
       document.body.appendChild(box);
     };
-
     // 결과 payload
     function getPayload(){ try{const p=JSON.parse(localStorage.getItem('resultPayload')||'null');return p&&typeof p==='object'?p:null;}catch(e){return null;} }
 
-    // SHIMs (외부 없을 때도 동작)
+    // 기본 데이터(없어도 동작)
     window.NAME_PARTS = window.NAME_PARTS || {
       adjectives:["불꽃같은","고요한","자유로운","빛나는","은은한","맑은","빠른","단단한","따스한","깊은"],
       nouns:["매","사슴","늑대","곰","여우","강","바람","별빛","해오라기","자작나무"],
@@ -95,10 +156,10 @@
       rarityWeights:{UR:0.05, SR:0.15, R:0.30, C:0.50},
       layers:[
         {name:"bg",mode:"single",items:[
-          {id:"bg-C", rarity:"common",  img:"assets/char/bg/bg_common.png", tags:["any"]},
-          {id:"bg-R", rarity:"Rare",  img:"assets/char/bg/bg_rare.png",   tags:["any"]},
-          {id:"bg-SR",rarity:"Super Rare", img:"assets/char/bg/bg_sr.png",     tags:["any"]},
-          {id:"bg-UR",rarity:"Ultra Rare", img:"assets/char/bg/bg_ur.png",     tags:["any"]}
+          {id:"bg-C", rarity:"C",  img:"assets/char/bg/bg_common.png", tags:["any"]},
+          {id:"bg-R", rarity:"R",  img:"assets/char/bg/bg_rare.png",   tags:["any"]},
+          {id:"bg-SR",rarity:"SR", img:"assets/char/bg/bg_sr.png",     tags:["any"]},
+          {id:"bg-UR",rarity:"UR", img:"assets/char/bg/bg_ur.png",     tags:["any"]}
         ]},
         {name:"base",mode:"single",items:[{id:"base-1",img:"assets/char/layer_body.png",tags:["any"]}]},
         {name:"eyes",mode:"single",items:[
@@ -151,10 +212,59 @@
       if (!pool.length) return null;
       return pool[Math.floor(Math.random()*pool.length)];
     }
-  </script>
 
-  <!-- 이름/명언/포스터/버튼 -->
-  <script>
+    // === 화면 FX와 저장 정적 하이라이트 ===
+    function applyFxByRarity(rarity){
+      const fx = document.getElementById('fxLayer');
+      if (!fx) return;
+      fx.setAttribute('data-rarity', rarity);
+    }
+    function drawRarityStatic(ctx, rarity, w, h){
+      w = w || ctx.canvas.width; h = h || ctx.canvas.height;
+      // 비네팅
+      const vin = ctx.createRadialGradient(w/2,h/2, Math.min(w,h)*0.2, w/2,h/2, Math.max(w,h)*0.7);
+      vin.addColorStop(0, 'rgba(0,0,0,0)');
+      vin.addColorStop(1, 'rgba(0,0,0,0.10)');
+      ctx.fillStyle = vin; ctx.fillRect(0,0,w,h);
+      // 금속 외곽선
+      if (rarity==='R' || rarity==='SR' || rarity==='UR'){
+        ctx.save();
+        ctx.lineWidth = Math.max(4, Math.round(w*0.01));
+        const grd = ctx.createLinearGradient(0,0,w,0);
+        grd.addColorStop(0,'rgba(255,255,255,.35)');
+        grd.addColorStop(0.5,'rgba(180,180,200,.55)');
+        grd.addColorStop(1,'rgba(255,255,255,.35)');
+        ctx.strokeStyle = grd;
+        ctx.strokeRect(ctx.lineWidth, ctx.lineWidth, w-ctx.lineWidth*2, h-ctx.lineWidth*2);
+        ctx.restore();
+      }
+      // 별가루
+      if (rarity==='SR' || rarity==='UR'){
+        ctx.save();
+        const n = 80*(rarity==='UR'?1.0:0.7);
+        for (let i=0;i<n;i++){
+          const x=Math.random()*w, y=Math.random()*h, r=Math.random()*2+0.3, a=Math.random()*0.6+0.2;
+          const g=ctx.createRadialGradient(x,y,0,x,y,r*3);
+          g.addColorStop(0,`rgba(255,255,255,${a})`);
+          g.addColorStop(1,'rgba(255,255,255,0)');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
+      }
+      // 황금 링 글로우
+      if (rarity==='UR'){
+        ctx.save();
+        const ring = ctx.createRadialGradient(w/2,h/2, Math.min(w,h)*0.35, w/2,h/2, Math.min(w,h)*0.52);
+        ring.addColorStop(0,'rgba(255,215,0,0)');
+        ring.addColorStop(0.5,'rgba(255,215,0,.25)');
+        ring.addColorStop(1,'rgba(255,215,0,0)');
+        ctx.globalCompositeOperation='screen';
+        ctx.fillStyle=ring; ctx.fillRect(0,0,w,h);
+        ctx.restore();
+      }
+    }
+
+    // 이름/텍스트
     function genNameAndMeta(){
       const p = getPayload();
       const a = window.NAME_PARTS;
@@ -176,7 +286,7 @@
       }
     }
 
-    // 텍스트 줄바꿈
+    // 포스터(1080x1920)
     function wrapText(ctx, text, x, y, maxWidth, lineHeight){
       const words = text.split(' '); let line=''; const lines=[];
       for (let n=0; n<words.length; n++) {
@@ -188,8 +298,6 @@
       lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight));
       return y + lines.length*lineHeight;
     }
-
-    // 모바일 전체 포스터(1080x1920)
     function drawFullPoster(W,H){
       const srcCanvas = document.getElementById('charCanvas');
       const name = (document.getElementById('nameText')?.textContent || '나의 영혼의 이름').trim();
@@ -256,7 +364,7 @@
       return c;
     }
 
-    // 버튼 동작: 저장/초대(첫 화면 링크 공유/복사)
+    // 버튼
     async function initButtons(){
       document.getElementById('saveFull')?.addEventListener('click', ()=>{
         const poster = drawFullPoster(1080,1920);
@@ -265,30 +373,15 @@
         a.href = poster.toDataURL('image/png');
         a.click();
       });
-
       document.getElementById('ctaInvite')?.addEventListener('click', async ()=>{
-        // 첫 화면(랜딩) URL만 고정으로 공유/복사
-        const landingUrl = 'https://yogitobi31.github.io/'; // 필요하면 프로젝트 페이지에 맞춰 변경
-        try {
-          if (navigator.share) {
-            await navigator.share({ title: '별바람 이름 테스트', text: '나도 해봤더니 재밌어!', url: landingUrl });
-            return;
-          }
-        } catch(_) { /* fallback */ }
-        try {
-          await navigator.clipboard.writeText(landingUrl);
-          alert('링크가 복사되었습니다!');
-        } catch(e){
-          const ta=document.createElement('textarea'); ta.value=landingUrl;
-          document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-          alert('링크가 복사되었습니다!');
-        }
+        const landingUrl = 'https://yogitobi31.github.io/'; // 루트 홈 고정
+        try { if(navigator.share){ await navigator.share({title:'별바람 이름 테스트', text:'나도 해봤더니 재밌어!', url:landingUrl}); return; } } catch(_) {}
+        try { await navigator.clipboard.writeText(landingUrl); alert('링크가 복사되었습니다!'); }
+        catch(e){ const ta=document.createElement('textarea'); ta.value=landingUrl; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('링크가 복사되었습니다!'); }
       });
     }
-  </script>
 
-  <!-- 캐릭터 렌더(테마+희귀도) & 명언 -->
-  <script>
+    // 캐릭터 합성(테마+희귀도) + 명언
     function renderByRarityTheme(){
       const cfg = window.CHARACTER_LAYERS;
       const canvas = document.getElementById('charCanvas');
@@ -313,9 +406,15 @@
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle='#fff8e1'; ctx.fillRect(0,0,canvas.width,canvas.height);
         imgs.forEach(img=>img && ctx.drawImage(img,0,0,canvas.width,canvas.height));
+
+        // 저장용 정적 하이라이트 + 화면 FX 적용
+        drawRarityStatic(ctx, rarity, canvas.width, canvas.height);
+        applyFxByRarity(rarity);
+
         const nameEl=document.getElementById('nameText');
         if (nameEl && !/\[(UR|SR|R|C)\]/.test(nameEl.textContent)) nameEl.textContent += ` [${rarity}]`;
       }
+      if (!picks.length) { finish(); return; }
       picks.forEach((url,i)=>{
         const img=new Image();
         img.onload=()=>{imgs[i]=img; if(++loaded===picks.length) finish();};
@@ -364,9 +463,9 @@
 
     document.addEventListener('DOMContentLoaded', function(){
       genNameAndMeta();        // 1) 이름/텍스트
-      renderByRarityTheme();   // 2) 캐릭터 합성
+      renderByRarityTheme();   // 2) 캐릭터 합성 + FX
       renderQuote();           // 3) 명언 카드
-      initButtons();           // 4) 저장/초대(첫 화면 공유)
+      initButtons();           // 4) 저장/초대
     });
   </script>
 </body>
